@@ -55,7 +55,7 @@ namespace ML2.UI.Core.Controls
 
         private void ApplyThemeCustom_Implementation(UIThemeInfo themeData)
         {
-            ExitButton.BackColor = themeData.LightBackColor;
+            ExitButton.BackColor = themeData.TitleBarColor;
         }
 
         public IEnumerable<Control> GetThemedControls()

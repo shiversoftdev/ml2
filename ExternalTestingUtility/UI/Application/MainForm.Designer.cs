@@ -30,6 +30,7 @@ namespace ML2
         private void InitializeComponent()
         {
             this.InnerForm = new ML2.UI.Core.Controls.CXBorderedForm();
+            this.ContentPanel = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.TopMenuBar = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,11 +47,8 @@ namespace ML2
             this.discordServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.InnerForm.ControlContents.SuspendLayout();
             this.TopMenuBar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // InnerForm
@@ -59,30 +57,40 @@ namespace ML2
             // 
             // InnerForm.ControlContents
             // 
-            this.InnerForm.ControlContents.Controls.Add(this.splitContainer1);
+            this.InnerForm.ControlContents.Controls.Add(this.ContentPanel);
             this.InnerForm.ControlContents.Controls.Add(this.toolStrip1);
             this.InnerForm.ControlContents.Controls.Add(this.TopMenuBar);
             this.InnerForm.ControlContents.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InnerForm.ControlContents.Enabled = true;
             this.InnerForm.ControlContents.Location = new System.Drawing.Point(0, 32);
             this.InnerForm.ControlContents.Name = "ControlContents";
-            this.InnerForm.ControlContents.Size = new System.Drawing.Size(796, 564);
+            this.InnerForm.ControlContents.Size = new System.Drawing.Size(1020, 732);
             this.InnerForm.ControlContents.TabIndex = 1;
             this.InnerForm.ControlContents.Visible = true;
             this.InnerForm.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InnerForm.Location = new System.Drawing.Point(0, 0);
             this.InnerForm.Name = "InnerForm";
-            this.InnerForm.Size = new System.Drawing.Size(800, 600);
+            this.InnerForm.Size = new System.Drawing.Size(1024, 768);
             this.InnerForm.TabIndex = 0;
             this.InnerForm.TitleBarTitle = "Black Ops III Mod Tools Launcher";
             this.InnerForm.UseTitleBar = true;
+            // 
+            // ContentPanel
+            // 
+            this.ContentPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ContentPanel.Location = new System.Drawing.Point(0, 50);
+            this.ContentPanel.Name = "ContentPanel";
+            this.ContentPanel.Size = new System.Drawing.Size(1020, 682);
+            this.ContentPanel.TabIndex = 2;
             // 
             // toolStrip1
             // 
             this.toolStrip1.Location = new System.Drawing.Point(0, 25);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.toolStrip1.Size = new System.Drawing.Size(796, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1020, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -97,9 +105,10 @@ namespace ML2
             this.TopMenuBar.Name = "TopMenuBar";
             this.TopMenuBar.Padding = new System.Windows.Forms.Padding(6, 4, 0, 2);
             this.TopMenuBar.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.TopMenuBar.Size = new System.Drawing.Size(796, 25);
+            this.TopMenuBar.Size = new System.Drawing.Size(1020, 25);
             this.TopMenuBar.TabIndex = 0;
             this.TopMenuBar.Text = "menuStrip1";
+            this.TopMenuBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.TopMenuBar_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -175,6 +184,7 @@ namespace ML2
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 19);
             this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // resourcesToolStripMenuItem
             // 
@@ -203,23 +213,11 @@ namespace ML2
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.aboutToolStripMenuItem.Text = "About";
             // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(4, 54);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.splitContainer1.Size = new System.Drawing.Size(788, 506);
-            this.splitContainer1.SplitterDistance = 244;
-            this.splitContainer1.TabIndex = 3;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.ClientSize = new System.Drawing.Size(1024, 768);
             this.Controls.Add(this.InnerForm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
@@ -228,8 +226,6 @@ namespace ML2
             this.InnerForm.ControlContents.PerformLayout();
             this.TopMenuBar.ResumeLayout(false);
             this.TopMenuBar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -253,7 +249,7 @@ namespace ML2
         private System.Windows.Forms.ToolStripMenuItem discordServerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem wikiToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Panel ContentPanel;
     }
 }
 
