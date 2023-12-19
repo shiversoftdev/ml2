@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 namespace ML2.UI.Core.Singletons
 {
@@ -77,9 +78,13 @@ namespace ML2.UI.Core.Singletons
             ThemedControls.Remove(sender as Control);
         }
 
+        private static Brush HighlightBrush = new SolidBrush(CurrentTheme.AccentColor);
+        private static Brush BackgroundBrush = new SolidBrush(CurrentTheme.BackColor);
         internal static void ApplyTheme(UIThemeInfo theme)
         {
             CurrentTheme = theme;
+            HighlightBrush = new SolidBrush(CurrentTheme.AccentColor);
+            BackgroundBrush = new SolidBrush(CurrentTheme.BackColor);
             foreach (var control in ThemedControls)
             {
                 ThemeSpecificControl(control);
@@ -188,6 +193,14 @@ namespace ML2.UI.Core.Singletons
                         cb.FlatStyle = FlatStyle.Flat;
                         cb.FlatAppearance.BorderColor = CurrentTheme.AccentColor;
                         break;
+                    case TreeView tv:
+                        tv.BackColor = CurrentTheme.BackColor;
+                        tv.ForeColor = CurrentTheme.TextColor;
+                        tv.BorderStyle = BorderStyle.None;
+                        tv.DrawNode -= ThemeableNode_Draw;
+                        tv.DrawMode = TreeViewDrawMode.OwnerDrawText;
+                        tv.DrawNode += ThemeableNode_Draw;
+                        break;
                     case DataGridView dgv:
                         dgv.BackgroundColor = CurrentTheme.BackColor;
                         dgv.ForeColor = CurrentTheme.TextColor;
@@ -226,12 +239,15 @@ namespace ML2.UI.Core.Singletons
                     case ToolStrip ts:
                         ts.BackColor = CurrentTheme.TitleBarColor;
                         ts.ForeColor = CurrentTheme.TextColor;
-                        ts.GripStyle = ToolStripGripStyle.Hidden;
 
                         foreach (ToolStripItem item in ts.Items)
                         {
                             ThemeTSI(item);
                         }
+                        break;
+                    case ElementHost eh:
+                        eh.BackColor = CurrentTheme.BackColor;
+                        eh.ForeColor = CurrentTheme.TextColor;
                         break;
                     default: throw new NotImplementedException($"Theming procedure for control type: '{control.GetType()}' has not been implemented.");
                 }
@@ -257,14 +273,23 @@ namespace ML2.UI.Core.Singletons
                 case ToolStripSeparator sep:
                     sep.BackColor = CurrentTheme.BackColor;
                     break;
+                case ToolStripButton tsb:
+                    tsb.ForeColor = CurrentTheme.TextColor;
+                    tsb.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
+                    break;
                 default:
 
                     throw new NotImplementedException($"Theming procedure for control type: '{item.GetType()}' has not been implemented.");
             }
         }
 
-        private static void RegisterAndThemeControl(Control control)
+        internal static void RegisterAndThemeControl(Control control)
         {
+            if(ThemedControls.Contains(control))
+            {
+                ThemeSpecificControl(control);
+                return;
+            }
             control.Disposed += ThemedControlDisposed;
             ThemedControls.Add(control);
             ThemeSpecificControl(control);
@@ -307,6 +332,23 @@ namespace ML2.UI.Core.Singletons
                 //Top2
                 g.DrawLine(borderPen, new Point(rect.X + box.Padding.Left + (int)(strSize.Width), rect.Y), new Point(rect.X + rect.Width, rect.Y));
             }
+        }
+
+        private static void ThemeableNode_Draw(object sender, DrawTreeNodeEventArgs e)
+        {
+            if (e.Node.IsSelected)
+            {
+                if ((sender as TreeView).Focused)
+                {
+                    e.Graphics.FillRectangle(HighlightBrush, e.Bounds);
+                }
+            }
+            else
+            {
+                e.Graphics.FillRectangle(BackgroundBrush, e.Bounds);
+            }
+
+            TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, e.Node.Bounds, CurrentTheme.TextColor);
         }
     }
 }

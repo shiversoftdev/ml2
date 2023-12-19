@@ -31,19 +31,33 @@ namespace ML2.UI.Application
         {
             this.components = new System.ComponentModel.Container();
             this.ProjectDiscoveryTimer = new System.Windows.Forms.Timer(this.components);
+            this.ProjectTree = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // ProjectDiscoveryTimer
             // 
             this.ProjectDiscoveryTimer.Interval = 5000;
             // 
+            // ProjectTree
+            // 
+            this.ProjectTree.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(14)))), ((int)(((byte)(18)))));
+            this.ProjectTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ProjectTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ProjectTree.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.ProjectTree.Location = new System.Drawing.Point(4, 4);
+            this.ProjectTree.Name = "ProjectTree";
+            this.ProjectTree.Size = new System.Drawing.Size(1012, 674);
+            this.ProjectTree.TabIndex = 0;
+            // 
             // CProjectList
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(14)))), ((int)(((byte)(18)))));
+            this.Controls.Add(this.ProjectTree);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "CProjectList";
+            this.Padding = new System.Windows.Forms.Padding(4);
             this.Size = new System.Drawing.Size(1020, 682);
             this.ResumeLayout(false);
 
@@ -52,5 +66,6 @@ namespace ML2.UI.Application
         #endregion
 
         private System.Windows.Forms.Timer ProjectDiscoveryTimer;
+        private System.Windows.Forms.TreeView ProjectTree;
     }
 }

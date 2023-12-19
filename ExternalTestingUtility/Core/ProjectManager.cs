@@ -12,37 +12,28 @@ namespace ML2.Core
         internal delegate void ProjectChangedEvent(ML2Project project);
 
         internal static ProjectChangedEvent OnProjectAdded;
+        internal static ProjectChangedEvent OnProjectUpdated;
         internal static ProjectChangedEvent OnProjectRemoved;
+        internal static ProjectChangedEvent OnActiveProjectChanged;
 
-        private static readonly string TA_GAME_PATH, TA_TOOLS_PATH, TA_LOCAL_ASSET_CACHE;
+        private static ML2Project __activeproject;
+        internal static ML2Project ActiveProject
+        {
+            get
+            {
+                return __activeproject;
+            }
+            set
+            {
+                __activeproject = value;
+                OnActiveProjectChanged.Invoke(value);
+            }
+        }
+
         private static readonly Dictionary<string, ML2Project> DiscoveredProjects;
 
         static ProjectManager()
         {
-#if DEBUG
-            Environment.SetEnvironmentVariable("TA_GAME_PATH", @"C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops III");
-            Environment.SetEnvironmentVariable("TA_TOOLS_PATH", @"C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops III");
-            Environment.SetEnvironmentVariable("TA_LOCAL_ASSET_CACHE", @"C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops III\share\assetconvert");
-#endif
-            TA_GAME_PATH = Environment.GetEnvironmentVariable("TA_GAME_PATH");
-            TA_TOOLS_PATH = Environment.GetEnvironmentVariable("TA_TOOLS_PATH");
-            TA_LOCAL_ASSET_CACHE = Environment.GetEnvironmentVariable("TA_LOCAL_ASSET_CACHE");
-
-            if (TA_GAME_PATH is null)
-            {
-                throw new InvalidOperationException("TA_GAME_PATH not set. Please run this program through steam or configure TA_GAME_PATH in your system environment variables.");
-            }
-
-            if (TA_TOOLS_PATH is null)
-            {
-                throw new InvalidOperationException("TA_TOOLS_PATH not set. Please run this program through steam or configure TA_TOOLS_PATH in your system environment variables.");
-            }
-
-            if (TA_LOCAL_ASSET_CACHE is null)
-            {
-                throw new InvalidOperationException("TA_LOCAL_ASSET_CACHE not set. Please run this program through steam or configure TA_LOCAL_ASSET_CACHE in your system environment variables.");
-            }
-
             DiscoveredProjects = new Dictionary<string, ML2Project>();
 
             DiscoverProjects();
@@ -50,15 +41,25 @@ namespace ML2.Core
 
         public static void DiscoverProjects()
         {
-            DiscoverProjectsInFolder(Path.Combine(TA_GAME_PATH, "usermaps"), false);
-            DiscoverProjectsInFolder(Path.Combine(TA_GAME_PATH, "mods"), true);
+            DiscoverProjectsInFolder(Path.Combine(Shared.TA_GAME_PATH, "usermaps"), false);
+            DiscoverProjectsInFolder(Path.Combine(Shared.TA_GAME_PATH, "mods"), true);
 
-            // TODO: clean stale projects that dont exist anymore, and verify that the zones of each file still match
-        }
+            // cleanup projects that dont exist on disk anymore
+            List<string> cleanup = new List<string>();
+            foreach(var project in DiscoveredProjects)
+            {
+                if(project.Value.Exists())
+                {
+                    continue;
+                }
+                cleanup.Add(project.Key);
+            }
 
-        private static void CheckProjectChanges(string projectFile)
-        {
-            // TODO: check for zone changes
+            foreach(string clean in cleanup)
+            {
+                OnProjectRemoved?.Invoke(DiscoveredProjects[clean]);
+                DiscoveredProjects.Remove(clean);
+            }
         }
 
         private static void DiscoverProjectsInFolder(string path, bool isMod)
@@ -68,9 +69,21 @@ namespace ML2.Core
                 string zone_source = Path.Combine(folder, "zone_source");
                 string project_file = Path.Combine(folder, ML2Project.PROJECT_FILE);
 
-                if(DiscoveredProjects.ContainsKey(project_file))
+                // update existing projects
+                if(DiscoveredProjects.ContainsKey(folder))
                 {
-                    CheckProjectChanges(project_file);
+                    if(DiscoveredProjects[folder].UpdateZoneInfo())
+                    {
+                        OnProjectUpdated?.Invoke(DiscoveredProjects[folder]);
+                        try
+                        {
+                            DiscoveredProjects[folder].SaveToDisk();
+                        }
+                        catch
+                        {
+                            Logger.LogWarning($"Project '{folder}' was unable to save to disk. This may be a permissions issue or another application may be accessing this file. (update save failed)");
+                        }
+                    }
                     continue;
                 }
 
@@ -79,6 +92,7 @@ namespace ML2.Core
                     continue;
                 }
 
+                // add a new project if possible
                 var project = ML2Project.FromPath(folder, isMod);
 
                 if(project is null)
@@ -88,6 +102,14 @@ namespace ML2.Core
 
                 DiscoveredProjects[folder] = project;
                 OnProjectAdded?.Invoke(project);
+            }
+        }
+
+        public static IEnumerable<ML2Project> GetProjects()
+        {
+            foreach(var p in DiscoveredProjects)
+            {
+                yield return p.Value;
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,31 @@ namespace ML2.UI.Application
             {
                 return __exitstatus;
             }
+        }
+
+        internal static Action OnActivityChanged;
+        public static string ActivityStatus
+        {
+            get
+            {
+                return ActivitiesStack.Count > 0 ? ActivitiesStack.Peek() : "";
+            }
+        }
+
+        private static Stack<string> ActivitiesStack = new Stack<string>();
+        public static void PushActivity(string status)
+        {
+            ActivitiesStack.Push(status);
+            OnActivityChanged?.Invoke();
+        }
+
+        public static void PopActivity(string status)
+        {
+#if DEBUG
+            Debug.Assert(ActivitiesStack.Peek() == status);
+#endif
+            ActivitiesStack.Pop();
+            OnActivityChanged?.Invoke();
         }
     }
 

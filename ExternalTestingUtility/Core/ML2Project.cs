@@ -12,10 +12,10 @@ namespace ML2.Core
     {
         // NOTE: We will design this class to be stored as a zip encoded json because we do not want people to directly mess with the json.
 
-
         public const string PROJECT_FILE = "project.dat";
         public ML2ProjectConfig Data;
         private string PathOnDisk;
+        private string PathToZone;
         private ML2Project() // prevent creation of the class from anywhere except inside the class
         {
             Data = new ML2ProjectConfig();
@@ -58,13 +58,13 @@ namespace ML2.Core
                 }
                 catch
                 {
-                    Logger.LogOnce(Logger.LogWarning, $"Project '{folder}' cannot be parsed because it contains an invalid project configuration. Send the '{PROJECT_FILE}' to the developer of this application by joining the discord server in Help->Discord for a possible recovery of your project data.");
+                    Logger.LogOnce(Logger.LogWarning, $"Project '{folder}' cannot be parsed because it contains an invalid project configuration. Send '{PROJECT_FILE}' to the developer of this application by joining the discord server in Help->Discord for a possible recovery of your project data.");
                     return null;
                 }
             }
             else
             {
-                project.Data = new ML2ProjectConfig();
+                project.Default();
             }
 
             // will always update since it shouldnt change
@@ -72,8 +72,10 @@ namespace ML2.Core
             project.Data.FriendlyName = project.Data.FriendlyName ?? project.Data.InternalName;
             project.Data.SimpleIsMod = isMod;
             project.PathOnDisk = project_file;
+            project.PathToZone = zone_source;
 
-            // TODO: update information stored in the data in case things changed since we parsed it
+            // pull zone info from disk
+            project.UpdateZoneInfo();
 
             try
             {
@@ -91,6 +93,32 @@ namespace ML2.Core
         public void SaveToDisk()
         {
             Shared.Compress(Encoding.ASCII.GetBytes(JsonSerializer.Serialize(Data, Shared.SerializeOptions)), PathOnDisk);
+        }
+
+        private void Default()
+        {
+            Data = new ML2ProjectConfig();
+            // TODO: setup default configs
+        }
+
+        /// <summary>
+        /// Pull zone list and other things from disk. Returns true if changes are made.
+        /// </summary>
+        /// <returns></returns>
+        public bool UpdateZoneInfo()
+        {
+            // TODO: get zone list
+            return false;
+        }
+
+        /// <summary>
+        /// Check if this project exists on disk
+        /// </summary>
+        /// <returns></returns>
+        public bool Exists()
+        {
+            // TODO
+            return true;
         }
     }
 

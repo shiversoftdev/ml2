@@ -32,6 +32,7 @@ namespace ML2
             this.InnerForm = new ML2.UI.Core.Controls.CXBorderedForm();
             this.ContentPanel = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripNewFile = new System.Windows.Forms.ToolStripButton();
             this.TopMenuBar = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,6 +49,7 @@ namespace ML2
             this.wikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.InnerForm.ControlContents.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.TopMenuBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -87,12 +89,24 @@ namespace ML2
             // 
             // toolStrip1
             // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripNewFile});
             this.toolStrip1.Location = new System.Drawing.Point(0, 25);
             this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Padding = new System.Windows.Forms.Padding(6, 0, 1, 0);
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
             this.toolStrip1.Size = new System.Drawing.Size(1020, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripNewFile
+            // 
+            this.toolStripNewFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripNewFile.Image = global::ML2.Properties.Resources.i_new_file;
+            this.toolStripNewFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripNewFile.Name = "toolStripNewFile";
+            this.toolStripNewFile.Size = new System.Drawing.Size(23, 22);
+            this.toolStripNewFile.Text = "New Project";
             // 
             // TopMenuBar
             // 
@@ -123,20 +137,27 @@ namespace ML2
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.newToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Control;
+            this.newToolStripMenuItem.Image = global::ML2.Properties.Resources.i_new_file;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.newToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+N";
+            this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.newToolStripMenuItem.Text = "New Project...";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
+            this.toolStripSeparator1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(144, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(187, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.exitToolStripMenuItem.ShortcutKeyDisplayString = "Alt+F4";
+            this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -152,8 +173,8 @@ namespace ML2
             // preferencesToolStripMenuItem
             // 
             this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
-            this.preferencesToolStripMenuItem.Text = "Preferences";
+            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.preferencesToolStripMenuItem.Text = "Preferences...";
             // 
             // toolsToolStripMenuItem
             // 
@@ -166,14 +187,19 @@ namespace ML2
             // 
             // assetEditorToolStripMenuItem
             // 
+            this.assetEditorToolStripMenuItem.Image = global::ML2.Properties.Resources.i_asset_editor;
             this.assetEditorToolStripMenuItem.Name = "assetEditorToolStripMenuItem";
-            this.assetEditorToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.assetEditorToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+A";
+            this.assetEditorToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.assetEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.assetEditorToolStripMenuItem.Text = "Asset Editor";
+            this.assetEditorToolStripMenuItem.Click += new System.EventHandler(this.assetEditorToolStripMenuItem_Click);
             // 
             // export2BinGUIToolStripMenuItem
             // 
+            this.export2BinGUIToolStripMenuItem.Image = global::ML2.Properties.Resources.i_export2bin;
             this.export2BinGUIToolStripMenuItem.Name = "export2BinGUIToolStripMenuItem";
-            this.export2BinGUIToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.export2BinGUIToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.export2BinGUIToolStripMenuItem.Text = "Export2Bin GUI";
             // 
             // helpToolStripMenuItem
@@ -192,25 +218,28 @@ namespace ML2
             this.discordServerToolStripMenuItem,
             this.wikiToolStripMenuItem});
             this.resourcesToolStripMenuItem.Name = "resourcesToolStripMenuItem";
-            this.resourcesToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.resourcesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.resourcesToolStripMenuItem.Text = "Resources";
             // 
             // discordServerToolStripMenuItem
             // 
+            this.discordServerToolStripMenuItem.Image = global::ML2.Properties.Resources.i_discord;
             this.discordServerToolStripMenuItem.Name = "discordServerToolStripMenuItem";
-            this.discordServerToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.discordServerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.discordServerToolStripMenuItem.Text = "Discord Server";
+            this.discordServerToolStripMenuItem.Click += new System.EventHandler(this.discordServerToolStripMenuItem_Click);
             // 
             // wikiToolStripMenuItem
             // 
+            this.wikiToolStripMenuItem.Enabled = false;
             this.wikiToolStripMenuItem.Name = "wikiToolStripMenuItem";
-            this.wikiToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.wikiToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.wikiToolStripMenuItem.Text = "Wiki";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
             // 
             // MainForm
@@ -221,9 +250,12 @@ namespace ML2
             this.Controls.Add(this.InnerForm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "External Testing";
             this.InnerForm.ControlContents.ResumeLayout(false);
             this.InnerForm.ControlContents.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.TopMenuBar.ResumeLayout(false);
             this.TopMenuBar.PerformLayout();
             this.ResumeLayout(false);
@@ -250,6 +282,7 @@ namespace ML2
         private System.Windows.Forms.ToolStripMenuItem wikiToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.Panel ContentPanel;
+        private System.Windows.Forms.ToolStripButton toolStripNewFile;
     }
 }
 
