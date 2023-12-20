@@ -33,6 +33,8 @@ namespace ML2
             this.ContentPanel = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripNewFile = new System.Windows.Forms.ToolStripButton();
+            this.BuildConfigCombo = new System.Windows.Forms.ToolStripComboBox();
+            this.PublishButton = new System.Windows.Forms.ToolStripButton();
             this.TopMenuBar = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,11 +45,17 @@ namespace ML2
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.assetEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.export2BinGUIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.radiantToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resourcesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.discordServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SecondSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.FirstSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.BuildRunButton = new System.Windows.Forms.ToolStripSplitButton();
+            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.InnerForm.ControlContents.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.TopMenuBar.SuspendLayout();
@@ -90,14 +98,19 @@ namespace ML2
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripNewFile});
+            this.toolStripNewFile,
+            this.FirstSeparator,
+            this.BuildConfigCombo,
+            this.BuildRunButton,
+            this.SecondSeparator,
+            this.PublishButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 25);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(6, 0, 1, 0);
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
             this.toolStrip1.Size = new System.Drawing.Size(1020, 25);
             this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
+            this.toolStrip1.Text = "TEST";
             // 
             // toolStripNewFile
             // 
@@ -107,6 +120,27 @@ namespace ML2
             this.toolStripNewFile.Name = "toolStripNewFile";
             this.toolStripNewFile.Size = new System.Drawing.Size(23, 22);
             this.toolStripNewFile.Text = "New Project";
+            // 
+            // BuildConfigCombo
+            // 
+            this.BuildConfigCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.BuildConfigCombo.DropDownWidth = 160;
+            this.BuildConfigCombo.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.BuildConfigCombo.Items.AddRange(new object[] {
+            "Debug (ERROR)",
+            "Configuration Manager..."});
+            this.BuildConfigCombo.Name = "BuildConfigCombo";
+            this.BuildConfigCombo.Size = new System.Drawing.Size(100, 25);
+            this.BuildConfigCombo.ToolTipText = "Build Configuration";
+            // 
+            // PublishButton
+            // 
+            this.PublishButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.PublishButton.Image = global::ML2.Properties.Resources.i_upload;
+            this.PublishButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.PublishButton.Name = "PublishButton";
+            this.PublishButton.Size = new System.Drawing.Size(23, 22);
+            this.PublishButton.Text = "Publish to Workshop";
             // 
             // TopMenuBar
             // 
@@ -180,7 +214,8 @@ namespace ML2
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.assetEditorToolStripMenuItem,
-            this.export2BinGUIToolStripMenuItem});
+            this.export2BinGUIToolStripMenuItem,
+            this.radiantToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 19);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -191,7 +226,7 @@ namespace ML2
             this.assetEditorToolStripMenuItem.Name = "assetEditorToolStripMenuItem";
             this.assetEditorToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+A";
             this.assetEditorToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.assetEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.assetEditorToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.assetEditorToolStripMenuItem.Text = "Asset Editor";
             this.assetEditorToolStripMenuItem.Click += new System.EventHandler(this.assetEditorToolStripMenuItem_Click);
             // 
@@ -199,8 +234,20 @@ namespace ML2
             // 
             this.export2BinGUIToolStripMenuItem.Image = global::ML2.Properties.Resources.i_export2bin;
             this.export2BinGUIToolStripMenuItem.Name = "export2BinGUIToolStripMenuItem";
-            this.export2BinGUIToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.export2BinGUIToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+E";
+            this.export2BinGUIToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.export2BinGUIToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.export2BinGUIToolStripMenuItem.Text = "Export2Bin GUI";
+            // 
+            // radiantToolStripMenuItem
+            // 
+            this.radiantToolStripMenuItem.Image = global::ML2.Properties.Resources.i_radiant;
+            this.radiantToolStripMenuItem.Name = "radiantToolStripMenuItem";
+            this.radiantToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+R";
+            this.radiantToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.radiantToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.radiantToolStripMenuItem.Text = "Radiant";
+            this.radiantToolStripMenuItem.Click += new System.EventHandler(this.radiantToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -218,14 +265,14 @@ namespace ML2
             this.discordServerToolStripMenuItem,
             this.wikiToolStripMenuItem});
             this.resourcesToolStripMenuItem.Name = "resourcesToolStripMenuItem";
-            this.resourcesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resourcesToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.resourcesToolStripMenuItem.Text = "Resources";
             // 
             // discordServerToolStripMenuItem
             // 
             this.discordServerToolStripMenuItem.Image = global::ML2.Properties.Resources.i_discord;
             this.discordServerToolStripMenuItem.Name = "discordServerToolStripMenuItem";
-            this.discordServerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.discordServerToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.discordServerToolStripMenuItem.Text = "Discord Server";
             this.discordServerToolStripMenuItem.Click += new System.EventHandler(this.discordServerToolStripMenuItem_Click);
             // 
@@ -233,14 +280,53 @@ namespace ML2
             // 
             this.wikiToolStripMenuItem.Enabled = false;
             this.wikiToolStripMenuItem.Name = "wikiToolStripMenuItem";
-            this.wikiToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.wikiToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.wikiToolStripMenuItem.Text = "Wiki";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.aboutToolStripMenuItem.Text = "About";
+            // 
+            // SecondSeparator
+            // 
+            this.SecondSeparator.Name = "SecondSeparator";
+            this.SecondSeparator.Size = new System.Drawing.Size(6, 25);
+            // 
+            // FirstSeparator
+            // 
+            this.FirstSeparator.Name = "FirstSeparator";
+            this.FirstSeparator.Size = new System.Drawing.Size(6, 25);
+            // 
+            // BuildRunButton
+            // 
+            this.BuildRunButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buildToolStripMenuItem,
+            this.runToolStripMenuItem});
+            this.BuildRunButton.Image = global::ML2.Properties.Resources.i_go;
+            this.BuildRunButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BuildRunButton.Name = "BuildRunButton";
+            this.BuildRunButton.Size = new System.Drawing.Size(66, 22);
+            this.BuildRunButton.Text = "Build";
+            // 
+            // buildToolStripMenuItem
+            // 
+            this.buildToolStripMenuItem.Image = global::ML2.Properties.Resources.i_go;
+            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
+            this.buildToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.B)));
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.buildToolStripMenuItem.Text = "Build";
+            // 
+            // runToolStripMenuItem
+            // 
+            this.runToolStripMenuItem.Image = global::ML2.Properties.Resources.i_go;
+            this.runToolStripMenuItem.Name = "runToolStripMenuItem";
+            this.runToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.R)));
+            this.runToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.runToolStripMenuItem.Text = "Run";
             // 
             // MainForm
             // 
@@ -283,6 +369,14 @@ namespace ML2
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.Panel ContentPanel;
         private System.Windows.Forms.ToolStripButton toolStripNewFile;
+        private System.Windows.Forms.ToolStripMenuItem radiantToolStripMenuItem;
+        private System.Windows.Forms.ToolStripComboBox BuildConfigCombo;
+        private System.Windows.Forms.ToolStripButton PublishButton;
+        private System.Windows.Forms.ToolStripSeparator SecondSeparator;
+        private System.Windows.Forms.ToolStripSeparator FirstSeparator;
+        private System.Windows.Forms.ToolStripSplitButton BuildRunButton;
+        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
     }
 }
 

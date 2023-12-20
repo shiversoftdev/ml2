@@ -22,6 +22,9 @@ namespace ML2.UI.Core.Singletons
         public Color LightBackColor;
         public Color ButtonActive;
         public Color TextInactive;
+        public Color GripLightColor;
+        public Color GripDarkColor;
+        public Color ArrowColor;
 
         public static UIThemeInfo Default()
         {
@@ -35,6 +38,9 @@ namespace ML2.UI.Core.Singletons
             theme.LightBackColor = Color.FromArgb(36, 36, 36);
             theme.ButtonActive = Color.DodgerBlue;
             theme.TextInactive = Color.Gray;
+            theme.GripLightColor = theme.LightBackColor;
+            theme.GripDarkColor = theme.ButtonHoverColor;
+            theme.ArrowColor = Color.WhiteSmoke;
             return theme;
         }
     }
@@ -47,9 +53,13 @@ namespace ML2.UI.Core.Singletons
         private static HashSet<Control> ThemedControls = new HashSet<Control>();
         private static Dictionary<Type, ThemeChangedCallback> CustomTypeHandlers = new Dictionary<Type, ThemeChangedCallback>();
         private static Dictionary<Control, ThemeChangedCallback> CustomControlHandlers = new Dictionary<Control, ThemeChangedCallback>();
+        private static CustomMenuStripRenderer CustomMenuRenderer;
+        private static CustomToolStripRenderer ToolStripRenderer;
         static UIThemeManager()
         {
             CurrentTheme = UIThemeInfo.Default();
+            CustomMenuRenderer = new CustomMenuStripRenderer();
+            ToolStripRenderer = new CustomToolStripRenderer();
         }
 
         /// <summary>
@@ -80,11 +90,14 @@ namespace ML2.UI.Core.Singletons
 
         private static Brush HighlightBrush = new SolidBrush(CurrentTheme.AccentColor);
         private static Brush BackgroundBrush = new SolidBrush(CurrentTheme.BackColor);
+        private static Brush TitlebarBrush = new SolidBrush(CurrentTheme.TitleBarColor);
+        private static Brush ButtonHoverBrush = new SolidBrush(CurrentTheme.ButtonHoverColor);
         internal static void ApplyTheme(UIThemeInfo theme)
         {
             CurrentTheme = theme;
             HighlightBrush = new SolidBrush(CurrentTheme.AccentColor);
             BackgroundBrush = new SolidBrush(CurrentTheme.BackColor);
+            ButtonHoverBrush = new SolidBrush(CurrentTheme.ButtonHoverColor);
             foreach (var control in ThemedControls)
             {
                 ThemeSpecificControl(control);
@@ -226,11 +239,12 @@ namespace ML2.UI.Core.Singletons
                             dgv.Rows[i].DefaultCellStyle.SelectionBackColor = CurrentTheme.AccentColor;
                         }
                         break;
-                    case MenuStrip ms: // TODO https://stackoverflow.com/questions/25425948/c-sharp-winforms-toolstripmenuitem-change-background
+                    case MenuStrip ms:
                         ms.BackColor = CurrentTheme.TitleBarColor;
                         ms.ForeColor = CurrentTheme.TextColor;
-                        
-                        foreach(ToolStripItem item in ms.Items)
+                        ms.RenderMode = ToolStripRenderMode.Professional;
+                        ms.Renderer = CustomMenuRenderer;
+                        foreach (ToolStripItem item in ms.Items)
                         {
                             ThemeTSI(item);
                         }
@@ -239,7 +253,8 @@ namespace ML2.UI.Core.Singletons
                     case ToolStrip ts:
                         ts.BackColor = CurrentTheme.TitleBarColor;
                         ts.ForeColor = CurrentTheme.TextColor;
-
+                        ts.RenderMode = ToolStripRenderMode.Professional;
+                        ts.Renderer = ToolStripRenderer;
                         foreach (ToolStripItem item in ts.Items)
                         {
                             ThemeTSI(item);
@@ -262,14 +277,6 @@ namespace ML2.UI.Core.Singletons
         {
             switch(item)
             {
-                case ToolStripMenuItem mi:
-                    item.ForeColor = CurrentTheme.TextColor;
-                    item.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
-                    foreach (ToolStripItem i in mi.DropDownItems)
-                    {
-                        ThemeTSI(i, false);
-                    }
-                    break;
                 case ToolStripSeparator sep:
                     sep.BackColor = CurrentTheme.BackColor;
                     break;
@@ -277,10 +284,62 @@ namespace ML2.UI.Core.Singletons
                     tsb.ForeColor = CurrentTheme.TextColor;
                     tsb.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
                     break;
+                case ToolStripComboBox tscb:
+                    tscb.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
+                    tscb.ForeColor = CurrentTheme.TextColor;
+                    tscb.FlatStyle = FlatStyle.Flat;
+                    //tscb.ComboBox.DrawMode = DrawMode.OwnerDrawFixed;
+                    //tscb.ComboBox.DrawItem += ComboBox_DrawItem;
+                    break;
+                case ToolStripSplitButton tssb:
+                    tssb.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
+                    tssb.ForeColor = CurrentTheme.TextColor;
+
+                    foreach (ToolStripItem i in tssb.DropDownItems)
+                    {
+                        ThemeTSI(i, false);
+                    }
+                    break;
+                case ToolStripDropDownButton ddb:
+                    ddb.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
+                    ddb.ForeColor = CurrentTheme.TextColor;
+                    
+                    foreach (ToolStripItem i in ddb.DropDownItems)
+                    {
+                        ThemeTSI(i, false);
+                    }
+
+                    break;
+                case ToolStripMenuItem mi:
+                    mi.ForeColor = CurrentTheme.TextColor;
+                    mi.BackColor = topmost ? CurrentTheme.TitleBarColor : CurrentTheme.BackColor;
+                   
+                    foreach (ToolStripItem i in mi.DropDownItems)
+                    {
+                        ThemeTSI(i, false);
+                    }
+                    break;
                 default:
 
                     throw new NotImplementedException($"Theming procedure for control type: '{item.GetType()}' has not been implemented.");
             }
+        }
+
+        private static void ComboBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            // throw new NotImplementedException();
+        }
+
+        private static void Tscb_Paint(object sender, PaintEventArgs e)
+        {
+            using (SolidBrush brush = new SolidBrush(Color.Red))
+                e.Graphics.FillRectangle(brush, (sender as ToolStripComboBox).ContentRectangle);
+
+            ControlPaint.DrawBorder(e.Graphics, (sender as ToolStripComboBox).ContentRectangle,
+                              Color.Red, 2, ButtonBorderStyle.Solid,
+                              Color.Red, 2, ButtonBorderStyle.Solid,
+                              Color.Red, 2, ButtonBorderStyle.Solid,
+                              Color.Red, 2, ButtonBorderStyle.Solid);
         }
 
         internal static void RegisterAndThemeControl(Control control)
@@ -349,6 +408,217 @@ namespace ML2.UI.Core.Singletons
             }
 
             TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, e.Node.Bounds, CurrentTheme.TextColor);
+        }
+
+        private class OverrideColorTable : ProfessionalColorTable
+        {
+            public override Color ToolStripDropDownBackground
+            {
+                get
+                {
+                    return CurrentTheme.BackColor;
+                }
+            }
+
+            public override Color ToolStripBorder
+            {
+                get
+                {
+                    return CurrentTheme.TitleBarColor;
+                }
+            }
+
+            public override Color GripDark
+            {
+                get
+                {
+                    return CurrentTheme.GripDarkColor;
+                }
+            }
+
+            public override Color GripLight
+            {
+                get
+                {
+                    return CurrentTheme.GripLightColor;
+                }
+            }
+
+            public override Color SeparatorLight
+            {
+                get
+                {
+                    return CurrentTheme.GripLightColor;
+                }
+            }
+            
+            public override Color SeparatorDark
+            {
+                get
+                {
+                    return CurrentTheme.GripDarkColor;
+                }
+            }
+
+            public override Color MenuItemSelected
+            {
+                get
+                {
+                    return CurrentTheme.ButtonHoverColor;
+                }
+            }
+
+            public override Color ButtonSelectedHighlight
+            {
+                get
+                {
+                    return CurrentTheme.ButtonHoverColor;
+                }
+            }
+
+            public override Color MenuBorder
+            {
+                get
+                {
+                    return CurrentTheme.ButtonHoverColor;
+                }
+            }
+
+            public override Color MenuItemBorder
+            {
+                get
+                {
+                    return CurrentTheme.ButtonHoverColor;
+                }
+            }
+            public override Color ToolStripGradientMiddle
+            {
+                get
+                {
+                    return CurrentTheme.TitleBarColor;
+                }
+            }
+
+            public override Color ToolStripGradientEnd
+            {
+                get
+                {
+                    return CurrentTheme.TitleBarColor;
+                }
+            }
+        }
+
+        private class CustomMenuStripRenderer : ToolStripProfessionalRenderer
+        {
+            public CustomMenuStripRenderer() : base(new OverrideColorTable())
+            {
+            }
+
+            protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+            {
+                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
+                Color c = (e.Item.Selected || e.Item.Pressed) ? CurrentTheme.ButtonHoverColor : e.Item.BackColor;
+                using (SolidBrush brush = new SolidBrush(c))
+                    e.Graphics.FillRectangle(brush, rc);
+            }
+
+            protected override void OnRenderButtonBackground(ToolStripItemRenderEventArgs e)
+            {
+                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
+                Color c = e.Item.Selected ? CurrentTheme.AccentColor : e.Item.BackColor;
+                using (SolidBrush brush = new SolidBrush(c))
+                    e.Graphics.FillRectangle(brush, rc);
+            }
+
+            protected override void OnRenderDropDownButtonBackground(ToolStripItemRenderEventArgs e)
+            {
+                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
+                Color c = (e.Item.Selected || e.Item.Pressed) ? CurrentTheme.AccentColor : e.Item.BackColor;
+                using (SolidBrush brush = new SolidBrush(c))
+                    e.Graphics.FillRectangle(brush, rc);
+            }
+
+            protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+            {
+                if(e is ToolStripArrowRenderEventArgsSBB x)
+                {
+                    e.ArrowColor = x.Color;
+                    base.OnRenderArrow(e);
+                    return;
+                }
+                e.ArrowColor = CurrentTheme.ArrowColor;
+                base.OnRenderArrow(e);
+            }
+
+            protected override void OnRenderImageMargin(ToolStripRenderEventArgs e)
+            {
+            }
+
+            protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+            {
+                base.OnRenderToolStripBorder(e);
+                Rectangle rc = new Rectangle(e.ConnectedArea.Location, new Size(e.ConnectedArea.Width, e.ConnectedArea.Height > 0 ? (e.ConnectedArea.Height - 1) : 0));
+                using (SolidBrush brush = new SolidBrush(CurrentTheme.ButtonHoverColor))
+                    e.Graphics.FillRectangle(brush, rc);
+            }
+
+            private class ToolStripArrowRenderEventArgsSBB : ToolStripArrowRenderEventArgs
+            {
+                public Color Color;
+                public ToolStripArrowRenderEventArgsSBB(Graphics g, ToolStripItem t, Rectangle r, Color c, ArrowDirection a) : base(g, t, r, c, a)
+                {
+                    this.Color = c;
+                }
+            }
+
+            protected override void OnRenderSplitButtonBackground(ToolStripItemRenderEventArgs e)
+            {
+                if((e.Item as ToolStripSplitButton).DropDownButtonPressed)
+                {
+                    e.Graphics.FillRectangle(HighlightBrush, e.Item.ContentRectangle);
+                    OnRenderArrow(new ToolStripArrowRenderEventArgsSBB(
+                        e.Graphics, e.Item, (e.Item as ToolStripSplitButton).DropDownButtonBounds, CurrentTheme.TextColor,
+                        ArrowDirection.Down));
+                    return;
+                }
+                if (!e.Item.Selected || e.Item.Pressed)
+                    base.OnRenderSplitButtonBackground(e);
+                else
+                {
+                    var sb = e.Item as ToolStripSplitButton;
+                    var button = sb.ButtonBounds;
+                    var dropdown = sb.DropDownButtonBounds;
+
+                    using(Pen pen = new Pen(CurrentTheme.GripDarkColor))
+                    {
+                        e.Graphics.FillRectangle(sb.ButtonPressed ? HighlightBrush : ButtonHoverBrush, button);
+                        e.Graphics.FillRectangle(ButtonHoverBrush, dropdown);
+                    }
+
+                    OnRenderArrow(new ToolStripArrowRenderEventArgs(
+                        e.Graphics, e.Item, sb.DropDownButtonBounds, e.Item.ForeColor,
+                        ArrowDirection.Down));
+                }
+            }
+        }
+
+        private class CustomToolStripRenderer : CustomMenuStripRenderer
+        {
+            protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+            {
+                base.OnRenderToolStripBorder(e);
+
+                if(e.ToolStrip.TopLevelControl is ToolStripDropDownMenu)
+                {
+                    return;
+                }
+
+                ControlPaint.DrawBorder(e.Graphics, e.ToolStrip.ClientRectangle,
+                              CurrentTheme.TitleBarColor, 2, ButtonBorderStyle.Solid,
+                              CurrentTheme.TitleBarColor, 2, ButtonBorderStyle.Solid,
+                              CurrentTheme.TitleBarColor, 2, ButtonBorderStyle.Solid,
+                              CurrentTheme.TitleBarColor, 2, ButtonBorderStyle.Solid);
+            }
         }
     }
 }

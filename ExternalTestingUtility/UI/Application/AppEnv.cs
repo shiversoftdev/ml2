@@ -27,24 +27,40 @@ namespace ML2.UI.Application
         {
             get
             {
-                return ActivitiesStack.Count > 0 ? ActivitiesStack.Peek() : "";
+                return ActivitiesStack.Count > 0 ? ActivitiesStack[ActivitiesStack.Count - 1] : "";
             }
         }
 
-        private static Stack<string> ActivitiesStack = new Stack<string>();
+        private static List<string> ActivitiesStack = new List<string>();
         public static void PushActivity(string status)
         {
-            ActivitiesStack.Push(status);
+            ActivitiesStack.Add(status);
             OnActivityChanged?.Invoke();
         }
 
         public static void PopActivity(string status)
         {
 #if DEBUG
-            Debug.Assert(ActivitiesStack.Peek() == status);
+            Debug.Assert(ActivitiesStack[ActivitiesStack.Count - 1] == status);
 #endif
-            ActivitiesStack.Pop();
+            ActivitiesStack.RemoveAt(ActivitiesStack.Count - 1);
             OnActivityChanged?.Invoke();
+        }
+
+        public static void ReplaceActivity(string oldVal, string newVal)
+        {
+            if(ActivityStatus == oldVal)
+            {
+                ActivitiesStack[ActivitiesStack.Count - 1] = newVal;
+                OnActivityChanged?.Invoke();
+            }
+            for(int i = 0; i < ActivitiesStack.Count - 1; i++)
+            {
+                if(ActivitiesStack[i] == oldVal)
+                {
+                    ActivitiesStack[i] = newVal;
+                }
+            }
         }
     }
 

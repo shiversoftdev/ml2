@@ -61,8 +61,9 @@ namespace ML2
             MinimizeBox = true;
             FormClosing += MainForm_FormClosing;
 
+            BuildConfigCombo.SelectedIndex = 0;
             SetActiveContent(CONTENT_DEFAULT);
-
+            RebuildToolStripItems();
             Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}^7] ^5Modtools Launcher {Shared.VERSION}^7, by ^2Serious");
         }
 
@@ -77,7 +78,10 @@ namespace ML2
         private Control WorkPaneFactory()
         {
             var pane = new CWorkPane();
-
+            ContentPanelChanged += (ContentPanelIndex from, ContentPanelIndex to) =>
+            {
+                pane.Opening();
+            };
             return pane;
         }
 
@@ -212,10 +216,10 @@ namespace ML2
             }
 
             ProjectManager.ActiveProject = project;
-            AppEnv.PushActivity(ProjectManager.ActiveProject.Data.FriendlyName);
+            AppEnv.PushActivity(ProjectManager.ActiveProject.FriendlyName);
             SetActiveContent(CONTENT_WORK_PANE);
             ConsumeFocus();
-            Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Active project changed: ^3{ProjectManager.ActiveProject.Data.FriendlyName}");
+            Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Active project changed: ^3{ProjectManager.ActiveProject.FriendlyName}");
         }
 
         internal void ConsumeFocus()
@@ -240,24 +244,61 @@ namespace ML2
 
             // TODO: if changes are pending, ask to save to disk
 
-            AppEnv.PopActivity(ProjectManager.ActiveProject.Data.FriendlyName);
+            AppEnv.PopActivity(ProjectManager.ActiveProject.FriendlyName);
             ProjectManager.ActiveProject = null;
             SetActiveContent(CONTENT_PROJECT_LIST);
         }
 
+        private void RebuildToolStripItems()
+        {
+            toolStrip1.Items.Clear();
+
+            toolStrip1.Items.Add(toolStripNewFile);
+            if (!(ProjectManager.ActiveProject is null))
+            {
+                toolStrip1.Items.Add(toolStripNewFile);
+                toolStrip1.Items.Add(FirstSeparator);
+                toolStrip1.Items.Add(BuildConfigCombo);
+                toolStrip1.Items.Add(BuildRunButton);
+                toolStrip1.Items.Add(SecondSeparator);
+                toolStrip1.Items.Add(PublishButton);
+            }
+        }
+
+        private ML2Project CachedProject = null;
         internal void OnActiveProjectChanged(ML2Project project)
         {
-            newToolStripMenuItem.Text = ProjectManager.ActiveProject is null ? "New Project..." : "Close Project";
-            newToolStripMenuItem.Image = ProjectManager.ActiveProject is null ? ML2.Properties.Resources.i_new_file : null;
-            newToolStripMenuItem.ShortcutKeyDisplayString = ProjectManager.ActiveProject is null ? "Ctrl+N" : "Ctrl+F4";
-            newToolStripMenuItem.ShortcutKeys = ProjectManager.ActiveProject is null ? (Keys.Control | Keys.N) : (Keys.Control | Keys.F4);
-
-            toolStrip1.Items.Remove(toolStripNewFile);
-
-            if(ProjectManager.ActiveProject is null)
+            if(CachedProject != project)
             {
-                toolStrip1.Items.Insert(0, toolStripNewFile);
+                newToolStripMenuItem.Text = project is null ? "New Project..." : "Close Project";
+                newToolStripMenuItem.Image = project is null ? ML2.Properties.Resources.i_new_file : null;
+                newToolStripMenuItem.ShortcutKeyDisplayString = project is null ? "Ctrl+N" : "Ctrl+F4";
+                newToolStripMenuItem.ShortcutKeys = project is null ? (Keys.Control | Keys.N) : (Keys.Control | Keys.F4);
+
+                if(CachedProject != null)
+                {
+                    CachedProject.OnNameUpdated -= OnNameUpdated;
+                }
+
+                CachedProject = project;
+
+                if (CachedProject != null)
+                {
+                    CachedProject.OnNameUpdated += OnNameUpdated;
+                }
+
+                RebuildToolStripItems();
             }
+            
+            if(CachedProject is null)
+            {
+                return;
+            }
+        }
+
+        private void OnNameUpdated(ML2Project project, string oldVal, string newVal)
+        {
+            AppEnv.ReplaceActivity(oldVal, newVal);
         }
 
         public class OverrideStripSystemRenderer : ToolStripSystemRenderer
@@ -297,6 +338,23 @@ namespace ML2
         private void discordServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://gsc.dev/s/discord");
+        }
+
+        private void radiantToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // TODO: check if target map is selected
+            var path_to_rad = Path.Combine(Shared.TA_TOOLS_PATH, "bin", "radiant_modtools.exe");
+            if (!File.Exists(path_to_rad))
+            {
+                CErrorDialog.Show("Error", "The level editor program, Radiant, could not be located. Please ensure that you have installed the original BO3 modtools.");
+                return;
+            }
+            Process.Start(path_to_rad);
+        }
+
+        private void runToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

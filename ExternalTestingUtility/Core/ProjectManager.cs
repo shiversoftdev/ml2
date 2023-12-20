@@ -12,7 +12,6 @@ namespace ML2.Core
         internal delegate void ProjectChangedEvent(ML2Project project);
 
         internal static ProjectChangedEvent OnProjectAdded;
-        internal static ProjectChangedEvent OnProjectUpdated;
         internal static ProjectChangedEvent OnProjectRemoved;
         internal static ProjectChangedEvent OnActiveProjectChanged;
 
@@ -60,6 +59,8 @@ namespace ML2.Core
                 OnProjectRemoved?.Invoke(DiscoveredProjects[clean]);
                 DiscoveredProjects.Remove(clean);
             }
+
+            ActiveProject?.UpdateZoneInfo();
         }
 
         private static void DiscoverProjectsInFolder(string path, bool isMod)
@@ -72,18 +73,6 @@ namespace ML2.Core
                 // update existing projects
                 if(DiscoveredProjects.ContainsKey(folder))
                 {
-                    if(DiscoveredProjects[folder].UpdateZoneInfo())
-                    {
-                        OnProjectUpdated?.Invoke(DiscoveredProjects[folder]);
-                        try
-                        {
-                            DiscoveredProjects[folder].SaveToDisk();
-                        }
-                        catch
-                        {
-                            Logger.LogWarning($"Project '{folder}' was unable to save to disk. This may be a permissions issue or another application may be accessing this file. (update save failed)");
-                        }
-                    }
                     continue;
                 }
 

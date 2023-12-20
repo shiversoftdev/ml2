@@ -31,10 +31,13 @@ namespace ML2.UI.Application
             Mikey.AccentColor = Color.SteelBlue;
             Mikey.TitleBarColor = Color.FromArgb(24, 24, 28);
             Mikey.ButtonFlatStyle = FlatStyle.Flat;
-            Mikey.ButtonHoverColor = Color.FromArgb(32, 32, 32);
+            Mikey.ButtonHoverColor = Color.FromArgb(42, 42, 50);
             Mikey.LightBackColor = Color.FromArgb(22, 22, 28);
             Mikey.ButtonActive = Color.SteelBlue;
             Mikey.TextInactive = Color.Gray;
+            Mikey.GripLightColor = Color.FromArgb(42, 42, 50);
+            Mikey.GripDarkColor = Color.FromArgb(132, 132, 142);
+            Mikey.ArrowColor = Mikey.GripDarkColor;
         }
     }
 }

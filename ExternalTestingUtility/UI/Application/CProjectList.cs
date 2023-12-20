@@ -26,7 +26,6 @@ namespace ML2.UI.Application
             ProjectDiscoveryTimer.Tick += ProjectDiscoveryTimer_Tick;
             ProjectManager.OnProjectAdded += ProjectManager_OnProjectAdded;
             ProjectManager.OnProjectRemoved += ProjectManager_OnProjectRemoved;
-            ProjectManager.OnProjectUpdated += ProjectManager_OnProjectUpdated;
             UIThemeManager.OnThemeChanged(this, ApplyThemeCustom_Implementation);
 
             Maps = HeaderFactory("Maps");
@@ -55,6 +54,7 @@ namespace ML2.UI.Application
             TreeNode node = new TreeNode();
             node.Text = name;
             ProjectTree.Nodes.Add(node);
+            node.ExpandAll();
             return node;
         }
 
@@ -135,8 +135,9 @@ namespace ML2.UI.Application
                 UpdateProject(project);
                 return;
             }
-            var header = project.Data.SimpleIsMod ? Mods : Maps;
+            var header = project.IsMod ? Mods : Maps;
             header.Nodes.Add(ProjectFactory(project));
+            project.OnNameUpdated += OnNameUpdated;
         }
 
         internal void RemoveProject(ML2Project project)
@@ -145,9 +146,19 @@ namespace ML2.UI.Application
             {
                 return;
             }
-            var header = project.Data.SimpleIsMod ? Mods : Maps;
+            var header = project.IsMod ? Mods : Maps;
             header.Nodes.Remove(ProjectTNCache[project]);
             ProjectTNCache.Remove(project);
+            project.OnNameUpdated -= OnNameUpdated;
+        }
+
+        internal void OnNameUpdated(ML2Project project, string oldVal, string newVal)
+        {
+            if (!ProjectTNCache.ContainsKey(project))
+            {
+                return;
+            }
+            ProjectTNCache[project].Text = newVal;
         }
 
         /// <summary>
@@ -161,7 +172,7 @@ namespace ML2.UI.Application
                 return;
             }
             var tvi = ProjectTNCache[project];
-            tvi.Text = project.Data.FriendlyName;
+            tvi.Text = project.FriendlyName;
         }
         #endregion
     }
