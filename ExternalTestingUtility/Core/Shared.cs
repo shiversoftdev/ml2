@@ -11,7 +11,7 @@ namespace ML2.Core
 {
     internal static class Shared
     {
-        internal const string VERSION = "2.0.0.0";
+        internal const string VERSION = "2.0.0";
         internal static readonly string TA_GAME_PATH, TA_TOOLS_PATH, TA_LOCAL_ASSET_CACHE;
         static Shared()
         {
@@ -38,6 +38,9 @@ namespace ML2.Core
             {
                 throw new InvalidOperationException("TA_LOCAL_ASSET_CACHE not set. Please run this program through steam or configure TA_LOCAL_ASSET_CACHE in your system environment variables.");
             }
+            
+            // TODO
+            // System.Console.SetOut()
         }
         internal class LowerNamePol : JsonNamingPolicy
         {

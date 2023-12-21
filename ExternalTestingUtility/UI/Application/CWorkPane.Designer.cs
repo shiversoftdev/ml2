@@ -29,21 +29,33 @@ namespace ML2.UI.Application
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.WindowsFormsIsDOGSHIT = new ML2.UI.Application.ZoneTreePanel();
             this.ProjectTree = new System.Windows.Forms.TreeView();
+            this.BuildConfigPane = new ML2.UI.Application.CBuildConfigPane();
             this.ThisShitIsAJOKE = new ML2.UI.Application.ConsolePanel();
             this.ConsoleBox = new System.Windows.Forms.RichTextBox();
+            this.ZoneTreeRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.RenameProjectButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConsoleContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.WindowsFormsIsDOGSHIT.SuspendLayout();
             this.ThisShitIsAJOKE.SuspendLayout();
+            this.ZoneTreeRightClick.SuspendLayout();
+            this.ConsoleContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -73,8 +85,13 @@ namespace ML2.UI.Application
             // splitContainer2.Panel1
             // 
             this.splitContainer2.Panel1.Controls.Add(this.WindowsFormsIsDOGSHIT);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.BuildConfigPane);
+            this.splitContainer2.Panel2.Padding = new System.Windows.Forms.Padding(0, 4, 4, 0);
             this.splitContainer2.Size = new System.Drawing.Size(1020, 340);
-            this.splitContainer2.SplitterDistance = 237;
+            this.splitContainer2.SplitterDistance = 225;
             this.splitContainer2.TabIndex = 0;
             // 
             // WindowsFormsIsDOGSHIT
@@ -83,19 +100,31 @@ namespace ML2.UI.Application
             this.WindowsFormsIsDOGSHIT.Dock = System.Windows.Forms.DockStyle.Fill;
             this.WindowsFormsIsDOGSHIT.Location = new System.Drawing.Point(0, 0);
             this.WindowsFormsIsDOGSHIT.Name = "WindowsFormsIsDOGSHIT";
-            this.WindowsFormsIsDOGSHIT.Padding = new System.Windows.Forms.Padding(2);
-            this.WindowsFormsIsDOGSHIT.Size = new System.Drawing.Size(237, 340);
+            this.WindowsFormsIsDOGSHIT.Padding = new System.Windows.Forms.Padding(2, 2, 2, 0);
+            this.WindowsFormsIsDOGSHIT.Size = new System.Drawing.Size(225, 340);
             this.WindowsFormsIsDOGSHIT.TabIndex = 0;
             // 
             // ProjectTree
             // 
             this.ProjectTree.CheckBoxes = true;
             this.ProjectTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ProjectTree.ItemHeight = 20;
             this.ProjectTree.Location = new System.Drawing.Point(2, 2);
             this.ProjectTree.Margin = new System.Windows.Forms.Padding(0);
             this.ProjectTree.Name = "ProjectTree";
-            this.ProjectTree.Size = new System.Drawing.Size(233, 336);
+            this.ProjectTree.Size = new System.Drawing.Size(221, 338);
             this.ProjectTree.TabIndex = 0;
+            // 
+            // BuildConfigPane
+            // 
+            this.BuildConfigPane.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(14)))), ((int)(((byte)(18)))));
+            this.BuildConfigPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BuildConfigPane.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BuildConfigPane.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BuildConfigPane.Location = new System.Drawing.Point(0, 4);
+            this.BuildConfigPane.Name = "BuildConfigPane";
+            this.BuildConfigPane.Size = new System.Drawing.Size(787, 336);
+            this.BuildConfigPane.TabIndex = 0;
             // 
             // ThisShitIsAJOKE
             // 
@@ -119,6 +148,56 @@ namespace ML2.UI.Application
             this.ConsoleBox.TabIndex = 0;
             this.ConsoleBox.Text = "";
             // 
+            // ZoneTreeRightClick
+            // 
+            this.ZoneTreeRightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.RenameProjectButton});
+            this.ZoneTreeRightClick.Name = "ZoneTreeRightClick";
+            this.ZoneTreeRightClick.Size = new System.Drawing.Size(118, 26);
+            // 
+            // RenameProjectButton
+            // 
+            this.RenameProjectButton.Name = "RenameProjectButton";
+            this.RenameProjectButton.Size = new System.Drawing.Size(117, 22);
+            this.RenameProjectButton.Text = "Rename";
+            this.RenameProjectButton.Click += new System.EventHandler(this.RenameProjectButton_Click);
+            // 
+            // ConsoleContextMenu
+            // 
+            this.ConsoleContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAllToolStripMenuItem,
+            this.copyToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.clearConsoleToolStripMenuItem});
+            this.ConsoleContextMenu.Name = "ConsoleContextMenu";
+            this.ConsoleContextMenu.Size = new System.Drawing.Size(148, 76);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.selectAllToolStripMenuItem.Text = "Select All";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.copyToolStripMenuItem.Text = "Copy Text";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(144, 6);
+            // 
+            // clearConsoleToolStripMenuItem
+            // 
+            this.clearConsoleToolStripMenuItem.Name = "clearConsoleToolStripMenuItem";
+            this.clearConsoleToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.clearConsoleToolStripMenuItem.Text = "Clear Console";
+            this.clearConsoleToolStripMenuItem.Click += new System.EventHandler(this.clearConsoleToolStripMenuItem_Click);
+            // 
             // CWorkPane
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -133,10 +212,13 @@ namespace ML2.UI.Application
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.WindowsFormsIsDOGSHIT.ResumeLayout(false);
             this.ThisShitIsAJOKE.ResumeLayout(false);
+            this.ZoneTreeRightClick.ResumeLayout(false);
+            this.ConsoleContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -149,5 +231,13 @@ namespace ML2.UI.Application
         private System.Windows.Forms.TreeView ProjectTree;
         private ZoneTreePanel WindowsFormsIsDOGSHIT;
         private ConsolePanel ThisShitIsAJOKE;
+        private System.Windows.Forms.ContextMenuStrip ZoneTreeRightClick;
+        private System.Windows.Forms.ToolStripMenuItem RenameProjectButton;
+        private System.Windows.Forms.ContextMenuStrip ConsoleContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem clearConsoleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
+        private CBuildConfigPane BuildConfigPane;
     }
 }

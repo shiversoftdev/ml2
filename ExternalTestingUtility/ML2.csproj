@@ -106,10 +106,24 @@
   <ItemGroup>
     <Compile Include="Cheats\BlackOps3.cs" />
     <Compile Include="Core\Logger.cs" />
+    <Compile Include="Core\ML2BuildAction.cs" />
+    <Compile Include="Core\ML2BuildConfiguration.cs" />
     <Compile Include="Core\ML2Project.cs" />
     <Compile Include="Core\ProjectManager.cs" />
     <Compile Include="Core\Shared.cs" />
     <Compile Include="UI\Application\AppEnv.cs" />
+    <Compile Include="UI\Application\CBuildConfigPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Application\CBuildConfigPane.Designer.cs">
+      <DependentUpon>CBuildConfigPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Application\ActionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Application\ActionForm.Designer.cs">
+      <DependentUpon>ActionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Application\CProjectList.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -132,6 +146,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Application\Themes.cs" />
+    <Compile Include="UI\Core\Controls\CYesNoDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Core\Controls\CYesNoDialog.Designer.cs">
+      <DependentUpon>CYesNoDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Core\Controls\CXBorderedForm.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -168,7 +188,12 @@
     <Compile Include="UI\Core\Interfaces\IResizableForm.cs" />
     <Compile Include="UI\Core\Interfaces\IThemeableControl.cs" />
     <Compile Include="UI\Core\Singletons\UIThemeManager.cs" />
-    <Compile Include="UI\Core\ThemeUtility.cs" />
+    <EmbeddedResource Include="UI\Application\CBuildConfigPane.resx">
+      <DependentUpon>CBuildConfigPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Application\ActionForm.resx">
+      <DependentUpon>ActionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Application\CProjectList.resx">
       <DependentUpon>CProjectList.cs</DependentUpon>
     </EmbeddedResource>
@@ -191,6 +216,9 @@
     <EmbeddedResource Include="UI\Core\Controls\CBorderedForm.resx" />
     <EmbeddedResource Include="UI\Core\Controls\CComboDialog.resx">
       <DependentUpon>CComboDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Core\Controls\CYesNoDialog.resx">
+      <DependentUpon>CYesNoDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Core\Controls\CErrorDialog.resx">
       <DependentUpon>CErrorDialog.cs</DependentUpon>

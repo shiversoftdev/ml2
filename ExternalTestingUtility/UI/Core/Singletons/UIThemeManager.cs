@@ -231,7 +231,8 @@ namespace ML2.UI.Core.Singletons
                         dgv.RowHeadersDefaultCellStyle.ForeColor = CurrentTheme.AccentColor;
                         dgv.RowHeadersVisible = false;
                         dgv.EnableHeadersVisualStyles = false;
-                        for(int i = 0; i < dgv.Rows.Count; i++)
+                        dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgv.ColumnHeadersDefaultCellStyle.BackColor = CurrentTheme.TitleBarColor;
+                        for (int i = 0; i < dgv.Rows.Count; i++)
                         {
                             dgv.Rows[i].DefaultCellStyle.ForeColor = dgv.ForeColor;
                             dgv.Rows[i].DefaultCellStyle.BackColor = CurrentTheme.BackColor;
@@ -395,19 +396,30 @@ namespace ML2.UI.Core.Singletons
 
         private static void ThemeableNode_Draw(object sender, DrawTreeNodeEventArgs e)
         {
-            if (e.Node.IsSelected)
+            if(e.Node.IsEditing)
             {
-                if ((sender as TreeView).Focused)
-                {
-                    e.Graphics.FillRectangle(HighlightBrush, e.Bounds);
-                }
+                e.Graphics.FillRectangle(BackgroundBrush, e.Bounds);
+                return;
+            }
+
+            if (e.Node.IsSelected && (sender as TreeView).Focused)
+            {
+                e.Graphics.FillRectangle(HighlightBrush, e.Bounds);
             }
             else
             {
                 e.Graphics.FillRectangle(BackgroundBrush, e.Bounds);
             }
 
-            TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, e.Node.Bounds, CurrentTheme.TextColor);
+            if(!e.Node.TreeView.CheckBoxes)
+            {
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, e.Node.Bounds, CurrentTheme.TextColor);
+            }
+            else
+            {
+                Rectangle r = new Rectangle(new Point(e.Node.Bounds.Location.X + 2, e.Node.Bounds.Location.Y - 1), e.Node.Bounds.Size);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, r, CurrentTheme.TextColor);
+            }
         }
 
         private class OverrideColorTable : ProfessionalColorTable

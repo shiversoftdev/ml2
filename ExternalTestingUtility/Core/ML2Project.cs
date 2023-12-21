@@ -13,6 +13,7 @@ namespace ML2.Core
         // NOTE: We will design this class to be stored as a zip encoded json because we do not want people to directly mess with the json.
         internal delegate void ProjectNameChangedEvent(ML2Project project, string oldVal, string newVal);
         internal delegate void ProjectZonesChangedEvent(ML2Project project, string[] removedZones, string[] addedZones);
+        internal delegate void ProjectActiveConfigEvent(ML2Project project, int newIndex, ML2BuildConfiguration config);
 
         public const string PROJECT_FILE = "project.dat";
         private ML2ProjectConfig Data;
@@ -22,8 +23,46 @@ namespace ML2.Core
 
         public ProjectNameChangedEvent OnNameUpdated;
         public ProjectZonesChangedEvent OnZonesUpdated;
+        public ProjectActiveConfigEvent OnActiveConfigChanged;
 
         private HashSet<string> __zoneslist;
+        private List<ML2BuildConfiguration> BuildConfigurations;
+
+        internal ML2BuildConfiguration ActiveConfig
+        {
+            get
+            {
+                // BUG: changing this without firing respective event may cause issues
+                if (BuildConfigurations.Count < 1)
+                {
+                    throw new IndexOutOfRangeException("Cannot get active config of project without any build configurations!");
+                }
+
+                if (Data.ActiveBuildConfig < 0 || Data.ActiveBuildConfig >= BuildConfigurations.Count)
+                {
+                    Data.ActiveBuildConfig = 0;
+                }
+
+                return BuildConfigurations[Data.ActiveBuildConfig];
+            }
+        }
+
+        internal int ActiveConfigIndex
+        {
+            get
+            {
+                return Data.ActiveBuildConfig;
+            }
+            set
+            {
+                if(value < 0 || value >= BuildConfigurations.Count)
+                {
+                    throw new IndexOutOfRangeException("Tried to change build config index, but the target index is out of range.");
+                }
+                OnActiveConfigChanged?.Invoke(this, value, BuildConfigurations[value]);
+                Data.ActiveBuildConfig = value;
+            }
+        }
 
         /// <summary>
         /// Public accessor for friendly name
@@ -52,6 +91,7 @@ namespace ML2.Core
         {
             Data = new ML2ProjectConfig();
             __zoneslist = new HashSet<string>();
+            BuildConfigurations = new List<ML2BuildConfiguration>();
         }
 
 
@@ -108,6 +148,24 @@ namespace ML2.Core
             project.PathToZone = zone_source;
             project.ProjectDirectory = folder;
 
+            foreach(var conf in project.Data.BuildConfigurations)
+            {
+                project.BuildConfigurations.Add(new ML2BuildConfiguration(conf));
+            }
+
+            if(project.BuildConfigurations.Count < 1)
+            {
+                var debug_default = ML2BuildConfigurationData.DebugDefault();
+                project.Data.BuildConfigurations.Add(debug_default);
+                project.BuildConfigurations.Add(new ML2BuildConfiguration(debug_default));
+            }
+
+            if(project.Data.ActiveBuildConfig < 0 || project.Data.ActiveBuildConfig >= project.BuildConfigurations.Count)
+            {
+                project.Data.ActiveBuildConfig = 0;
+            }
+            
+
             // pull zone info from disk
             project.UpdateZoneInfo();
 
@@ -127,12 +185,13 @@ namespace ML2.Core
         public void SaveToDisk()
         {
             Shared.Compress(Encoding.ASCII.GetBytes(JsonSerializer.Serialize(Data, Shared.SerializeOptions)), PathOnDisk);
+            // File.WriteAllText(PathOnDisk + ".debug", JsonSerializer.Serialize(Data, Shared.SerializeOptions));
         }
 
         private void Default()
         {
             Data = new ML2ProjectConfig();
-            // TODO: setup default configs
+            // TODO: setup default configs (including default build configurations)
         }
 
         /// <summary>
@@ -200,6 +259,14 @@ namespace ML2.Core
         {
             return Directory.Exists(ProjectDirectory);
         }
+
+        public IEnumerable<ML2BuildConfiguration> GetBuildConfigurations()
+        {
+            foreach(var config in BuildConfigurations)
+            {
+                yield return config;
+            }
+        }
     }
 
     public sealed class ML2ProjectConfig
@@ -207,9 +274,12 @@ namespace ML2.Core
         public string InternalName { get; set; }
         public string FriendlyName { get; set; }
         public bool SimpleIsMod { get; set; }
+        public int ActiveBuildConfig { get; set; }
+        public List<ML2BuildConfigurationData> BuildConfigurations { get; set; }
         public ML2ProjectConfig()
         {
-
+            BuildConfigurations = new List<ML2BuildConfigurationData>();
+            ActiveBuildConfig = -1;
         }
     }
 }

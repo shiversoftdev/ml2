@@ -44,6 +44,7 @@ namespace ML2.UI.Application
             this.ProjectTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ProjectTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ProjectTree.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.ProjectTree.ItemHeight = 22;
             this.ProjectTree.Location = new System.Drawing.Point(4, 4);
             this.ProjectTree.Name = "ProjectTree";
             this.ProjectTree.Size = new System.Drawing.Size(1012, 674);

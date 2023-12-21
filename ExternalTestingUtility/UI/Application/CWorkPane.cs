@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace ML2.UI.Application
 {
-    public partial class CWorkPane : UserControl, IThemeableControl
+    public partial class CWorkPane : UserControl, IThemeableControl, IContentPanel
     {
         private ML2DetailedProjectTreeNode Header;
         private Dictionary<string, ML2ProjectZoneNode> ZoneNodes;
@@ -27,12 +27,51 @@ namespace ML2.UI.Application
             UIThemeManager.OnThemeChanged(this, ThemeUpdated);
 
             ProjectTree.NodeMouseDoubleClick += ProjectTree_NodeMouseDoubleClick;
+            ProjectTree.NodeMouseClick += ProjectTree_NodeMouseClick;
 
             ProjectTree.AfterLabelEdit += ProjectTree_AfterLabelEdit;
             ProjectTree.BeforeCollapse += ProjectTree_BeforeCollapse;
 
             ProjectTree.KeyDown += ProjectTree_KeyDown;
             ProjectTree.AfterCheck += ProjectTree_AfterCheck;
+
+            ConsoleBox.ContextMenuStrip = ConsoleContextMenu;
+        }
+
+        private bool PopuplateZoneTreeRightClickMenu(TreeNodeMouseClickEventArgs e)
+        {
+            if(e.Node is null)
+            {
+                return false;
+            }
+
+            ZoneTreeRightClick.Items.Clear();
+            
+
+            if(Header == e.Node)
+            {
+                ZoneTreeRightClick.Items.Add(RenameProjectButton);
+            }
+
+            if(ZoneTreeRightClick.Items.Count == 0)
+            {
+                return false;
+            }
+            
+            return true;
+        }
+
+        private void ProjectTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                ProjectTree.SelectedNode = e.Node;
+                if(!PopuplateZoneTreeRightClickMenu(e))
+                {
+                    return;
+                }
+                ZoneTreeRightClick.Show(ProjectTree, e.Location);
+            }
         }
 
         private bool DontMatchChecksRightNow = false;
@@ -260,6 +299,9 @@ namespace ML2.UI.Application
             yield return ProjectTree;
             yield return WindowsFormsIsDOGSHIT;
             yield return ThisShitIsAJOKE;
+            yield return ZoneTreeRightClick;
+            yield return ConsoleContextMenu;
+            yield return BuildConfigPane;
         }
 
         Color previous = Color.White;
@@ -359,6 +401,46 @@ namespace ML2.UI.Application
                 Project = project;
                 Zone = zone;
             }
+        }
+
+        private void RenameProjectButton_Click(object sender, EventArgs e)
+        {
+            ProjectTree.LabelEdit = true;
+            Header.BeginEdit();
+        }
+
+        private void clearConsoleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConsoleBox.Clear();
+            HighlightText($"[{DateTime.Now.ToLongTimeString()}] ^3 Console Cleared!".AsSpan());
+        }
+
+        private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConsoleBox.SelectAll();
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(ConsoleBox.SelectedText != null && ConsoleBox.SelectedText.Length > 0)
+            {
+                Clipboard.SetText(ConsoleBox.SelectedText);
+            }
+        }
+
+        public bool CanClosePanelNow()
+        {
+            return BuildConfigPane.CanClosePanelNow();
+        }
+
+        public void OnContentClosing()
+        {
+            BuildConfigPane.OnContentClosing();
+        }
+
+        public void OnContentOpening()
+        {
+            BuildConfigPane.OnContentOpening();
         }
     }
 

@@ -14,6 +14,7 @@ namespace ML2.Core
         internal static ProjectChangedEvent OnProjectAdded;
         internal static ProjectChangedEvent OnProjectRemoved;
         internal static ProjectChangedEvent OnActiveProjectChanged;
+        internal static ProjectChangedEvent BeforeActiveProjectChanged;
 
         private static ML2Project __activeproject;
         internal static ML2Project ActiveProject
@@ -24,6 +25,7 @@ namespace ML2.Core
             }
             set
             {
+                BeforeActiveProjectChanged?.Invoke(__activeproject);
                 __activeproject = value;
                 OnActiveProjectChanged.Invoke(value);
             }

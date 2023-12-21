@@ -63,8 +63,19 @@ namespace ML2
 
             BuildConfigCombo.SelectedIndex = 0;
             SetActiveContent(CONTENT_DEFAULT);
-            RebuildToolStripItems();
+            RebuildToolStripItems(null);
             Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}^7] ^5Modtools Launcher {Shared.VERSION}^7, by ^2Serious");
+
+            FormClosing += MainForm_FormClosing1;
+        }
+
+        private void MainForm_FormClosing1(object sender, FormClosingEventArgs e)
+        {
+            if(!(ProjectManager.ActiveProject is null))
+            {
+                ProjectManager.ActiveProject = null;
+            }
+            SetActiveContent(CONTENT_NONE); // invoke closing events on everything
         }
 
         private Control ProjectListPaneFactory()
@@ -166,7 +177,7 @@ namespace ML2
         {
             if(CurrentContent != CONTENT_NONE)
             {
-                if(ContentPanel is IContentPanel ip)
+                if(UIPanes[CurrentContent] is IContentPanel ip)
                 {
                     if (!ip.CanClosePanelNow())
                     {
@@ -218,20 +229,7 @@ namespace ML2
             ProjectManager.ActiveProject = project;
             AppEnv.PushActivity(ProjectManager.ActiveProject.FriendlyName);
             SetActiveContent(CONTENT_WORK_PANE);
-            ConsumeFocus();
             Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Active project changed: ^3{ProjectManager.ActiveProject.FriendlyName}");
-        }
-
-        internal void ConsumeFocus()
-        {
-            Task.Delay(100).ContinueWith(_ =>
-            {
-                Invoke(new Action(() =>
-                {
-                    Focus();
-                    Select();
-                }));
-            });
         }
 
         internal void CloseActiveProject()
@@ -249,12 +247,13 @@ namespace ML2
             SetActiveContent(CONTENT_PROJECT_LIST);
         }
 
-        private void RebuildToolStripItems()
+        private bool SuspendBuildConfigEvents = false;
+        private void RebuildToolStripItems(ML2Project project)
         {
             toolStrip1.Items.Clear();
 
             toolStrip1.Items.Add(toolStripNewFile);
-            if (!(ProjectManager.ActiveProject is null))
+            if (!(project is null))
             {
                 toolStrip1.Items.Add(toolStripNewFile);
                 toolStrip1.Items.Add(FirstSeparator);
@@ -262,6 +261,29 @@ namespace ML2
                 toolStrip1.Items.Add(BuildRunButton);
                 toolStrip1.Items.Add(SecondSeparator);
                 toolStrip1.Items.Add(PublishButton);
+
+                SuspendBuildConfigEvents = true;
+                BuildConfigCombo.ComboBox.Items.Clear();
+
+                foreach(var conf in project.GetBuildConfigurations())
+                {
+                    BuildConfigCombo.ComboBox.Items.Add(conf);
+                }
+
+                BuildConfigCombo.ComboBox.Items.Add("Configuration Manager...");
+                SuspendBuildConfigEvents = false;
+                BuildConfigCombo.SelectedIndex = project.ActiveConfigIndex;
+            }
+            else
+            {
+                SuspendBuildConfigEvents = true;
+                BuildConfigCombo.ComboBox.Items.Clear();
+                BuildConfigCombo.ComboBox.Items.Add("ERROR - I DONT EXIST");
+                BuildConfigCombo.ComboBox.Items.Add("PLEASE REPORT THIS TO THE DEVELOPER");
+                BuildConfigCombo.ComboBox.Items.Add("YOU SHOULD NOT SEE ME");
+                BuildConfigCombo.ComboBox.Items.Add("Configuration Manager...");
+                BuildConfigCombo.SelectedIndex = 0;
+                SuspendBuildConfigEvents = false;
             }
         }
 
@@ -287,7 +309,7 @@ namespace ML2
                     CachedProject.OnNameUpdated += OnNameUpdated;
                 }
 
-                RebuildToolStripItems();
+                RebuildToolStripItems(project);
             }
             
             if(CachedProject is null)
