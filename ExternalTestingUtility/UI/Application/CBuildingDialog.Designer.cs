@@ -1,7 +1,7 @@
 ﻿
-namespace ML2.UI.Core.Controls
+namespace ML2.UI.Application
 {
-    partial class ActionForm
+    partial class CBuildingDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,8 @@ namespace ML2.UI.Core.Controls
         private void InitializeComponent()
         {
             this.InnerForm = new ML2.UI.Core.Controls.CXBorderedForm();
-            this.PropertyEditor = new System.Windows.Forms.PropertyGrid();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.ErrorRTB = new System.Windows.Forms.RichTextBox();
             this.InnerForm.ControlContents.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -40,39 +41,51 @@ namespace ML2.UI.Core.Controls
             // 
             // InnerForm.ControlContents
             // 
-            this.InnerForm.ControlContents.Controls.Add(this.PropertyEditor);
+            this.InnerForm.ControlContents.Controls.Add(this.progressBar1);
+            this.InnerForm.ControlContents.Controls.Add(this.ErrorRTB);
             this.InnerForm.ControlContents.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InnerForm.ControlContents.Enabled = true;
             this.InnerForm.ControlContents.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InnerForm.ControlContents.Location = new System.Drawing.Point(0, 32);
             this.InnerForm.ControlContents.Name = "ControlContents";
-            this.InnerForm.ControlContents.Size = new System.Drawing.Size(446, 364);
+            this.InnerForm.ControlContents.Size = new System.Drawing.Size(259, 95);
             this.InnerForm.ControlContents.TabIndex = 1;
             this.InnerForm.ControlContents.Visible = true;
             this.InnerForm.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InnerForm.Location = new System.Drawing.Point(0, 0);
             this.InnerForm.Name = "InnerForm";
-            this.InnerForm.Size = new System.Drawing.Size(450, 400);
+            this.InnerForm.Size = new System.Drawing.Size(263, 131);
             this.InnerForm.TabIndex = 0;
-            this.InnerForm.TitleBarTitle = "Build Action Editor";
+            this.InnerForm.TitleBarTitle = "Please Wait...";
             this.InnerForm.UseTitleBar = true;
             // 
-            // PropertyEditor
+            // progressBar1
             // 
-            this.PropertyEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PropertyEditor.Location = new System.Drawing.Point(0, 0);
-            this.PropertyEditor.Name = "PropertyEditor";
-            this.PropertyEditor.Size = new System.Drawing.Size(446, 364);
-            this.PropertyEditor.TabIndex = 0;
+            this.progressBar1.Location = new System.Drawing.Point(4, 68);
+            this.progressBar1.MarqueeAnimationSpeed = 30;
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(251, 23);
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.TabIndex = 1;
             // 
-            // ActionForm
+            // ErrorRTB
+            // 
+            this.ErrorRTB.DetectUrls = false;
+            this.ErrorRTB.Location = new System.Drawing.Point(4, 4);
+            this.ErrorRTB.Name = "ErrorRTB";
+            this.ErrorRTB.ReadOnly = true;
+            this.ErrorRTB.Size = new System.Drawing.Size(251, 58);
+            this.ErrorRTB.TabIndex = 0;
+            this.ErrorRTB.Text = "Generic wait message... you are waiting but you do not know why...";
+            // 
+            // CBuildingDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 400);
+            this.ClientSize = new System.Drawing.Size(263, 131);
             this.Controls.Add(this.InnerForm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "ActionForm";
+            this.Name = "CBuildingDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Error Dialog";
             this.InnerForm.ControlContents.ResumeLayout(false);
@@ -83,6 +96,7 @@ namespace ML2.UI.Core.Controls
         #endregion
 
         private ML2.UI.Core.Controls.CXBorderedForm InnerForm;
-        private System.Windows.Forms.PropertyGrid PropertyEditor;
+        private System.Windows.Forms.RichTextBox ErrorRTB;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }

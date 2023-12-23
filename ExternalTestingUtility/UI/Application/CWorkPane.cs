@@ -50,6 +50,10 @@ namespace ML2.UI.Application
 
             if(Header == e.Node)
             {
+                ZoneTreeRightClick.Items.Add(addZoneToolStripMenuItem);
+                ZoneTreeRightClick.Items.Add(toolStripSeparator2);
+                ZoneTreeRightClick.Items.Add(openFolderToolStripMenuItem);
+                ZoneTreeRightClick.Items.Add(toolStripSeparator3);
                 ZoneTreeRightClick.Items.Add(RenameProjectButton);
             }
 
@@ -412,7 +416,7 @@ namespace ML2.UI.Application
         private void clearConsoleToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ConsoleBox.Clear();
-            HighlightText($"[{DateTime.Now.ToLongTimeString()}] ^3 Console Cleared!".AsSpan());
+            HighlightText($"[{DateTime.Now.ToLongTimeString()}] ^3 Console Cleared!^7\n".AsSpan());
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -442,6 +446,16 @@ namespace ML2.UI.Application
         {
             BuildConfigPane.OnContentOpening();
         }
+
+        private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start(ProjectManager.ActiveProject.ProjectDirectory);
+        }
+
+        private void addZoneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     internal class ZoneTreePanel : Panel
@@ -451,7 +465,8 @@ namespace ML2.UI.Application
         {
             base.OnPaint(e);
 
-            ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
+            Rectangle modified = new Rectangle(ClientRectangle.Location, new Size(ClientRectangle.Width, ClientRectangle.Height + 2));
+            ControlPaint.DrawBorder(e.Graphics, modified,
                                   UIThemeManager.CurrentTheme.TitleBarColor, 0, ButtonBorderStyle.Solid,
                                   UIThemeManager.CurrentTheme.TitleBarColor, 0, ButtonBorderStyle.Solid,
                                   UIThemeManager.CurrentTheme.TitleBarColor, BORDER_SIZE, ButtonBorderStyle.Solid,

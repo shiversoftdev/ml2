@@ -56,6 +56,7 @@ namespace ML2
             this.discordServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BuildBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.InnerForm.ControlContents.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.TopMenuBar.SuspendLayout();
@@ -150,6 +151,7 @@ namespace ML2
             this.BuildRunButton.Name = "BuildRunButton";
             this.BuildRunButton.Size = new System.Drawing.Size(66, 22);
             this.BuildRunButton.Text = "Build";
+            this.BuildRunButton.ButtonClick += new System.EventHandler(this.BuildRunButton_ButtonClick);
             // 
             // buildToolStripMenuItem
             // 
@@ -157,8 +159,9 @@ namespace ML2
             this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
             this.buildToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.B)));
-            this.buildToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.buildToolStripMenuItem.Text = "Build";
+            this.buildToolStripMenuItem.Click += new System.EventHandler(this.buildToolStripMenuItem_Click);
             // 
             // runToolStripMenuItem
             // 
@@ -166,7 +169,7 @@ namespace ML2
             this.runToolStripMenuItem.Name = "runToolStripMenuItem";
             this.runToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.R)));
-            this.runToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.runToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.runToolStripMenuItem.Text = "Run";
             // 
             // SecondSeparator
@@ -330,6 +333,11 @@ namespace ML2
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.aboutToolStripMenuItem.Text = "About";
             // 
+            // BuildBackgroundWorker
+            // 
+            this.BuildBackgroundWorker.WorkerReportsProgress = true;
+            this.BuildBackgroundWorker.WorkerSupportsCancellation = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -379,6 +387,7 @@ namespace ML2
         private System.Windows.Forms.ToolStripSplitButton BuildRunButton;
         private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker BuildBackgroundWorker;
     }
 }
 

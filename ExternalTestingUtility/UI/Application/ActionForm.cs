@@ -1,4 +1,5 @@
-﻿using ML2.UI.Core.Interfaces;
+﻿using ML2.Core;
+using ML2.UI.Core.Interfaces;
 using ML2.UI.Core.Singletons;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,9 @@ namespace ML2.UI.Core.Controls
 {
     public partial class ActionForm : Form, IThemeableControl
     {
-        // TODO: if anything changes *at all* we need to set DialogResult to OK
+        private int ActionIndex;
+        private ML2BuildActionEditor ActiveEditor;
+        public bool AnyChanged { private set; get; }
         public ActionForm(int actionIndex, bool isEdit)
         {
             InitializeComponent();
@@ -24,6 +27,22 @@ namespace ML2.UI.Core.Controls
             MinimizeBox = true;
             Text = InnerForm.TitleBarTitle = isEdit ? "Build Action Editor" : "Build Action Creator";
             DialogResult = DialogResult.Cancel;
+            ActionIndex = actionIndex;
+
+            OnActiveEditorTypeChanged();
+        }
+
+        private void OnActiveEditorTypeChanged()
+        {
+            ActiveEditor = ProjectManager.ActiveProject.ActiveConfig.GetAction(ActionIndex).Editor();
+            ActiveEditor.OnActionTypeChanged += OnActiveEditorTypeChanged;
+            ActiveEditor.OnAnyPropertyChanged += OnAnyPropChanged;
+            PropertyEditor.SelectedObject = ActiveEditor;
+        }
+
+        private void OnAnyPropChanged()
+        {
+            AnyChanged = true;
         }
 
         private void OnThemeChanged_Implementation(UIThemeInfo themeData)
@@ -44,11 +63,6 @@ namespace ML2.UI.Core.Controls
         private void button1_Click(object sender, EventArgs e)
         {
 
-        }
-
-        public static void Show(string title, string description)
-        {
-            new CErrorDialog(title, description).ShowDialog();
         }
     }
 }

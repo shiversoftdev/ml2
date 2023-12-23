@@ -13,17 +13,20 @@ namespace ML2.Core
         // NOTE: We will design this class to be stored as a zip encoded json because we do not want people to directly mess with the json.
         internal delegate void ProjectNameChangedEvent(ML2Project project, string oldVal, string newVal);
         internal delegate void ProjectZonesChangedEvent(ML2Project project, string[] removedZones, string[] addedZones);
-        internal delegate void ProjectActiveConfigEvent(ML2Project project, int newIndex, ML2BuildConfiguration config);
+        internal delegate void ProjectActiveConfigEvent(ML2Project project, int oldIndex, int newIndex, ML2BuildConfiguration config);
+        internal delegate void ProjectConfigChangedEvent(ML2BuildConfiguration config);
 
         public const string PROJECT_FILE = "project.dat";
         private ML2ProjectConfig Data;
         private string PathOnDisk;
         private string PathToZone;
-        private string ProjectDirectory;
+        public string ProjectDirectory { private set; get; }
 
         public ProjectNameChangedEvent OnNameUpdated;
         public ProjectZonesChangedEvent OnZonesUpdated;
         public ProjectActiveConfigEvent OnActiveConfigChanged;
+        public ProjectConfigChangedEvent OnBuildConfigDeleted;
+        public ProjectConfigChangedEvent OnBuildConfigAdded;
 
         private HashSet<string> __zoneslist;
         private List<ML2BuildConfiguration> BuildConfigurations;
@@ -59,10 +62,13 @@ namespace ML2.Core
                 {
                     throw new IndexOutOfRangeException("Tried to change build config index, but the target index is out of range.");
                 }
-                OnActiveConfigChanged?.Invoke(this, value, BuildConfigurations[value]);
+                int oldVal = Data.ActiveBuildConfig;
                 Data.ActiveBuildConfig = value;
+                OnActiveConfigChanged?.Invoke(this, oldVal, value, BuildConfigurations[value]);
             }
         }
+
+        internal int ConfigCount => BuildConfigurations.Count;
 
         /// <summary>
         /// Public accessor for friendly name
@@ -260,12 +266,120 @@ namespace ML2.Core
             return Directory.Exists(ProjectDirectory);
         }
 
-        public IEnumerable<ML2BuildConfiguration> GetBuildConfigurations()
+        internal IEnumerable<ML2BuildConfiguration> GetBuildConfigurations()
         {
             foreach(var config in BuildConfigurations)
             {
                 yield return config;
             }
+        }
+
+        internal ML2BuildConfiguration GetConfiguration(int index)
+        {
+            if(index < 0 || index >= BuildConfigurations.Count)
+            {
+                throw new IndexOutOfRangeException($"Build configuration '{index}' is out of range");
+            }
+            return BuildConfigurations[index];
+        }
+
+        internal bool AnyConfigNamed(string name)
+        {
+            foreach(var config in BuildConfigurations)
+            {
+                if(config.Name == name)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal void AddDebugConfig()
+        {
+            var debug_default = ML2BuildConfigurationData.DebugDefault();
+            Data.BuildConfigurations.Add(debug_default);
+            var conf = new ML2BuildConfiguration(debug_default);
+
+            int i = 0;
+            string name = conf.Name;
+            while(AnyConfigNamed(name))
+            {
+                i++;
+                name = $"{conf.Name} ({i})";
+            }
+
+            conf.Name = name;
+
+            BuildConfigurations.Add(conf);
+            OnBuildConfigAdded?.Invoke(conf);
+        }
+
+        internal void DeleteConfiguration(int index)
+        {
+            if(BuildConfigurations.Count < 2)
+            {
+                throw new InvalidOperationException("Cannot delete a configuration because the project only has 1 configuration available");
+            }
+
+            // to keep things the simplest, we need to select a new index, change it, delete the old thing, and refresh all UIs
+            
+            // cache for later
+            var conf = BuildConfigurations[index];
+
+            int newIndex = 0;
+            if(index == newIndex)
+            {
+                newIndex++;
+            }
+
+            ActiveConfigIndex = newIndex; // unbind all active events
+
+            // if the deleted config is below the new active config, active config now points to the wrong index
+            if(newIndex > index)
+            {
+                Data.ActiveBuildConfig--;
+            }
+
+            Data.BuildConfigurations.RemoveAt(index);
+            BuildConfigurations.RemoveAt(index);
+            OnBuildConfigDeleted?.Invoke(conf);
+        }
+
+        internal void CloneConfig(int index)
+        {
+            if(index < 0 || index >= BuildConfigurations.Count)
+            {
+                throw new InvalidOperationException($"Cannot clone index '{index}' because it is out of range.");
+            }
+            var config = BuildConfigurations[index].CopyData();
+            var conf = new ML2BuildConfiguration(config);
+
+            int i = 0;
+            string name = conf.Name;
+            while (AnyConfigNamed(name))
+            {
+                i++;
+                name = $"{conf.Name} ({i})";
+            }
+
+            conf.Name = name;
+
+            BuildConfigurations.Add(conf);
+            Data.BuildConfigurations.Add(config);
+            OnBuildConfigAdded?.Invoke(conf);
+        }
+
+        public int FindConfigIndex(ML2BuildConfiguration conf)
+        {
+            for(int i = 0; i < BuildConfigurations.Count; i++)
+            {
+                if(BuildConfigurations[i] == conf)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 

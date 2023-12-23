@@ -33,7 +33,7 @@ namespace ML2
 
         private Dictionary<ContentPanelIndex, Control> UIPanes;
         private ContentPanelIndex CurrentContent = CONTENT_NONE;
-
+        private int PreviousComboIndex = 0;
         public MainForm()
         {
             // Sets up stealth calls for native funcs to try to avoid api hooking
@@ -61,12 +61,44 @@ namespace ML2
             MinimizeBox = true;
             FormClosing += MainForm_FormClosing;
 
-            BuildConfigCombo.SelectedIndex = 0;
+            PreviousComboIndex = BuildConfigCombo.SelectedIndex = 0;
             SetActiveContent(CONTENT_DEFAULT);
             RebuildToolStripItems(null);
             Shared.Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}^7] ^5Modtools Launcher {Shared.VERSION}^7, by ^2Serious");
 
             FormClosing += MainForm_FormClosing1;
+            BuildConfigCombo.SelectedIndexChanged += BuildConfigCombo_SelectedIndexChanged;
+        }
+
+        private void OnConfigNameUpdated(ML2BuildConfiguration conf)
+        {
+            int index = ProjectManager.ActiveProject.FindConfigIndex(conf);
+            BuildConfigCombo.Items[index] = conf.Name;
+        }
+
+        private void BuildConfigCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(SuspendBuildConfigEvents)
+            {
+                return;
+            }
+            if(BuildConfigCombo.SelectedIndex == PreviousComboIndex)
+            {
+                return;
+            }
+            if(BuildConfigCombo.SelectedIndex == BuildConfigCombo.Items.Count - 1)
+            {
+                BuildConfigCombo.SelectedIndex = PreviousComboIndex;
+                OpenConfigurationManager();
+                return;
+            }
+            PreviousComboIndex = BuildConfigCombo.SelectedIndex;
+            ProjectManager.ActiveProject.ActiveConfigIndex = BuildConfigCombo.SelectedIndex;
+        }
+
+        private void OpenConfigurationManager()
+        {
+            new ConfigurationManagerForm().ShowDialog();
         }
 
         private void MainForm_FormClosing1(object sender, FormClosingEventArgs e)
@@ -272,6 +304,7 @@ namespace ML2
 
                 BuildConfigCombo.ComboBox.Items.Add("Configuration Manager...");
                 SuspendBuildConfigEvents = false;
+                PreviousComboIndex = -1;
                 BuildConfigCombo.SelectedIndex = project.ActiveConfigIndex;
             }
             else
@@ -287,6 +320,16 @@ namespace ML2
             }
         }
 
+        private void OnActiveConfigChanged(ML2Project project, int oldIndex, int newIndex, ML2BuildConfiguration config)
+        {
+        }
+
+        private void OnBuildConfigDeleted(ML2BuildConfiguration conf)
+        {
+            conf.OnConfigNameUpdated -= OnConfigNameUpdated;
+            RebuildToolStripItems(ProjectManager.ActiveProject);
+        }
+
         private ML2Project CachedProject = null;
         internal void OnActiveProjectChanged(ML2Project project)
         {
@@ -300,6 +343,13 @@ namespace ML2
                 if(CachedProject != null)
                 {
                     CachedProject.OnNameUpdated -= OnNameUpdated;
+                    CachedProject.OnActiveConfigChanged -= OnActiveConfigChanged;
+                    CachedProject.OnBuildConfigAdded -= OnBuildConfigAdded;
+                    foreach(var item in CachedProject.GetBuildConfigurations())
+                    {
+                        item.OnConfigNameUpdated -= OnConfigNameUpdated;
+                    }
+                    CachedProject.OnBuildConfigDeleted -= OnBuildConfigDeleted;
                 }
 
                 CachedProject = project;
@@ -307,6 +357,13 @@ namespace ML2
                 if (CachedProject != null)
                 {
                     CachedProject.OnNameUpdated += OnNameUpdated;
+                    CachedProject.OnBuildConfigAdded += OnBuildConfigAdded;
+                    CachedProject.OnActiveConfigChanged += OnActiveConfigChanged;
+                    foreach (var item in CachedProject.GetBuildConfigurations())
+                    {
+                        item.OnConfigNameUpdated += OnConfigNameUpdated;
+                    }
+                    CachedProject.OnBuildConfigDeleted += OnBuildConfigDeleted;
                 }
 
                 RebuildToolStripItems(project);
@@ -316,6 +373,12 @@ namespace ML2
             {
                 return;
             }
+        }
+
+        private void OnBuildConfigAdded(ML2BuildConfiguration config)
+        {
+            config.OnConfigNameUpdated += OnConfigNameUpdated;
+            BuildConfigCombo.Items.Insert(BuildConfigCombo.Items.Count - 1, config.Name);
         }
 
         private void OnNameUpdated(ML2Project project, string oldVal, string newVal)
@@ -378,6 +441,43 @@ namespace ML2
         {
 
         }
+
+        private void BuildRunButton_ButtonClick(object sender, EventArgs e)
+        {
+            BuildActiveProject();
+        }
+
+        private void buildToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildActiveProject();
+        }
+
+        private CBuildingDialog BuildDialogWindow;
+        private void BuildActiveProject()
+        {
+            if(ProjectManager.ActiveProject is null || ProjectManager.ActiveProject.ActiveConfig is null)
+            {
+                CErrorDialog.Show("Build Failed", "Cannot build an empty project or configuration.");
+                return;
+            }
+
+            if (ProjectManager.ActiveProject.ActiveConfig.ActionsCount <= 0)
+            {
+                CErrorDialog.Show("Build Failed", "No build steps to execute!");
+                return;
+            }
+
+            
+            BuildDialogWindow = new CBuildingDialog("Build Project", "Build started...");
+            BuildDialogWindow.CancelRequested += (object sender, EventArgs e) =>
+            {
+                
+            };
+
+            BuildBackgroundWorker.RunWorkerAsync();
+            BuildDialogWindow.ShowDialog();
+        }
+
     }
 
     internal enum ContentPanelIndex

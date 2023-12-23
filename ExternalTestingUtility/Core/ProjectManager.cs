@@ -31,11 +31,14 @@ namespace ML2.Core
             }
         }
 
+        internal static bool BuildActive { get; private set; }
+
         private static readonly Dictionary<string, ML2Project> DiscoveredProjects;
 
         static ProjectManager()
         {
             DiscoveredProjects = new Dictionary<string, ML2Project>();
+            BuildActive = false;
 
             DiscoverProjects();
         }

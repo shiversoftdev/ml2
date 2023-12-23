@@ -10,9 +10,26 @@ namespace ML2.Core
     internal sealed class ML2BuildConfiguration
     {
         private ML2BuildConfigurationData Data;
+        internal delegate void UpdatedConfigPropEvent(ML2BuildConfiguration e);
+        internal UpdatedConfigPropEvent OnConfigNameUpdated;
+
         private List<ML2BuildAction> BuildActions;
 
         public int ActionsCount => BuildActions.Count;
+
+        public string Name
+        {
+            get
+            {
+                return Data.Name;
+            }
+            set
+            {
+                Data.Name = value;
+                OnConfigNameUpdated?.Invoke(this);
+            }
+        }
+
 
         public ML2BuildConfiguration(ML2BuildConfigurationData data)
         {
@@ -81,6 +98,19 @@ namespace ML2.Core
             var cloned = (JsonSerializer.Deserialize(JsonSerializer.Serialize(Data.BuildActionQueue[index], Shared.SerializeOptions), typeof(ML2BuildActionData), Shared.SerializeOptions) as ML2BuildActionData);
             Data.BuildActionQueue.Insert(index + 1, cloned);
             BuildActions.Insert(index + 1, new ML2BuildAction(cloned));
+        }
+
+        public int New()
+        {
+            var action = ML2BuildActionData.DefaultCompile();
+            Data.BuildActionQueue.Add(action);
+            BuildActions.Add(new ML2BuildAction(action));
+            return BuildActions.Count - 1;
+        }
+
+        public ML2BuildConfigurationData CopyData()
+        {
+            return (ML2BuildConfigurationData)JsonSerializer.Deserialize(JsonSerializer.Serialize(Data, Shared.SerializeOptions), typeof(ML2BuildConfigurationData), Shared.SerializeOptions);
         }
     }
 

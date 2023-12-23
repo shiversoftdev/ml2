@@ -89,6 +89,11 @@ namespace ML2.UI.Application
             // Get the row index of the item the mouse is below. 
             RowIndexOfItemUnderMouseToDrop = BuildConfigDataGrid.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
 
+            if(RowIndexOfItemUnderMouseToDrop < 0)
+            {
+                return;
+            }
+
             // If the drag operation was a move then remove and insert the row.
             if (e.Effect == DragDropEffects.Move)
             {
@@ -170,12 +175,20 @@ namespace ML2.UI.Application
                     ProjectManager.ActiveProject.SaveToDisk();
                     break;
                 case 2: // Name
-                    ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).Name = BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+                    ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).Name = BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value?.ToString() ?? ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).DefaultName();
                     ProjectManager.ActiveProject.SaveToDisk();
+                    if(BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value is null)
+                    {
+                        BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).Name;
+                    }
                     break;
                 case 3: // Description
-                    ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).Description = BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+                    ProjectManager.ActiveProject.ActiveConfig.GetAction(configIndex).Description = BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value?.ToString() ?? "No description";
                     ProjectManager.ActiveProject.SaveToDisk();
+                    if (BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value is null)
+                    {
+                        BuildConfigDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = "No description";
+                    }
                     break;
             }
         }
@@ -194,9 +207,22 @@ namespace ML2.UI.Application
         {
             if(CachedProject != project)
             {
+                if(CachedProject != null)
+                {
+                    CachedProject.OnActiveConfigChanged -= OnActiveConfigChanged;
+                }
                 CachedProject = project;
+                if (CachedProject != null)
+                {
+                    CachedProject.OnActiveConfigChanged += OnActiveConfigChanged;
+                }
                 RefreshConfigTable();
             }
+        }
+
+        private void OnActiveConfigChanged(ML2Project project, int oldIndex, int newIndex, ML2BuildConfiguration config)
+        {
+            RefreshConfigTable();
         }
 
         private void BeforeActiveProjectChanged(ML2Project project)
@@ -289,8 +315,11 @@ namespace ML2.UI.Application
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int configIndex = (int)BuildConfigDataGrid.Rows[ContextMenuSelectedNode.RowIndex].Cells[0].Value;
-            if(new ActionForm(configIndex, true).ShowDialog() == DialogResult.OK)
+            var form = new ActionForm(configIndex, true);
+            form.ShowDialog();
+            if (form.AnyChanged)
             {
+                ProjectManager.ActiveProject.SaveToDisk();
                 RefreshConfigTable();
                 BuildConfigDataGrid.Rows[ContextMenuSelectedNode.RowIndex].Cells[ContextMenuSelectedNode.ColumnIndex].Selected = true;
             }
@@ -298,7 +327,12 @@ namespace ML2.UI.Application
 
         private void newBuildActionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: create a new 'none' type action as last index, then send the index to the action form
+            int configIndex = ProjectManager.ActiveProject.ActiveConfig.New();
+            var form = new ActionForm(configIndex, false);
+            form.ShowDialog();
+            ProjectManager.ActiveProject.SaveToDisk();
+            RefreshConfigTable();
+            BuildConfigDataGrid.Rows[configIndex].Cells[0].Selected = true;
         }
     }
 }
